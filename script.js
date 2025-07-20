@@ -116,6 +116,7 @@ class LanguageManager {
                 invoiceTitle: 'Invoice',
                 produit: 'Product',
                 couleur: 'Color',
+                Variantes: 'variable',   
                 quantite: 'Quantity',
                 nom: 'Name',
                 telephone: 'Phone',
