@@ -174,10 +174,20 @@
     <div class="modal-overlay" id="modalOverlay">
         <div class="invoice-modal" id="orderModal">
             <div class="modal-header">
-                <h2 data-key="invoiceTitle">Facture</h2>
-                <button class="modal-close" id="modalClose">
-                    <i class="fas fa-times"></i>
-                </button>
+                <div class="modal-header-content">
+                    <h2 data-key="invoiceTitle">Facture</h2>
+                    <div class="modal-header-actions">
+                        <button class="modal-action-btn print-btn" id="printBtn" title="طباعة">
+                            <i class="fas fa-print"></i>
+                        </button>
+                        <button class="modal-action-btn save-btn" id="saveBtn" title="حفظ كصورة">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="modal-action-btn modal-close" id="modalClose" title="إغلاق">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <div class="modal-body">
