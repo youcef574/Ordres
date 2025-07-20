@@ -28,10 +28,10 @@ class LanguageManager {
                 addTestOrder: 'Commande test',
                 
                 // Table Headers
-                orderNumber: 'N°',
-                customerName: 'Nom',
+                orderNumber: 'N° Commande',
+                customerName: 'Nom du client',
                 phone: 'Téléphone',
-                wilaya: 'Wilaya',
+                address: 'Adresse',
                 product: 'Produit',
                 variants: 'Variantes',
                 quantity: 'Quantité',
@@ -98,10 +98,10 @@ class LanguageManager {
                 addTestOrder: 'Test order',
                 
                 // Table Headers
-                orderNumber: 'N°',
-                customerName: 'Name',
+                orderNumber: 'Order #',
+                customerName: 'Customer Name',
                 phone: 'Phone',
-                wilaya: 'Wilaya',
+                address: 'Address',
                 product: 'Product',
                 variants: 'Variants',
                 quantity: 'Quantity',
@@ -228,11 +228,11 @@ class OrdersManager {
     generateSampleOrders() {
         const sampleOrders = [
             {
-                id: 'ORD-001',
-                customerName: 'Marie Dubois',
+                id: '1',
+                customerName: 'Marie',
                 phone: '+33 6 12 34 56 78',
-                wilaya: 'Alger',
-                address: '123 Rue de la Paix, Alger',
+                wilaya: 'Paris',
+                city: 'Paris',
                 product: 'Collier Élégance',
                 variants: 'Or rose, 45cm',
                 quantity: 1,
@@ -244,11 +244,11 @@ class OrdersManager {
                 isRead: false
             },
             {
-                id: 'ORD-002',
-                customerName: 'Jean Martin',
+                id: '2',
+                customerName: 'Jean',
                 phone: '+33 6 98 76 54 32',
-                wilaya: 'Oran',
-                address: '456 Avenue des Champs, Oran',
+                wilaya: 'Rhône',
+                city: 'Lyon',
                 product: 'Bague Diamant',
                 variants: 'Argent, Taille 56',
                 quantity: 1,
@@ -260,11 +260,11 @@ class OrdersManager {
                 isRead: true
             },
             {
-                id: 'ORD-003',
-                customerName: 'Sophie Laurent',
+                id: '3',
+                customerName: 'Sophie',
                 phone: '+33 6 11 22 33 44',
-                wilaya: 'Constantine',
-                address: '789 Boulevard Saint-Michel, Constantine',
+                wilaya: 'Bouches-du-Rhône',
+                city: 'Marseille',
                 product: 'Bracelet Charme',
                 variants: 'Or blanc, 18cm',
                 quantity: 2,
@@ -281,23 +281,8 @@ class OrdersManager {
     }
     
     bindEvents() {
-        // Search functionality with clear button
-        const searchInput = document.getElementById('searchInput');
-        const searchClear = document.getElementById('searchClear');
-        
-        searchInput.addEventListener('input', (e) => {
-            const value = e.target.value;
-            if (value.length > 0) {
-                searchClear.style.display = 'block';
-            } else {
-                searchClear.style.display = 'none';
-            }
-            this.filterOrders();
-        });
-        
-        searchClear.addEventListener('click', () => {
-            searchInput.value = '';
-            searchClear.style.display = 'none';
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
             this.filterOrders();
         });
         
@@ -351,7 +336,9 @@ class OrdersManager {
                 order.customerName.toLowerCase().includes(searchTerm) ||
                 order.phone.includes(searchTerm) ||
                 order.id.toLowerCase().includes(searchTerm) ||
-                order.product.toLowerCase().includes(searchTerm);
+                order.product.toLowerCase().includes(searchTerm) ||
+                order.wilaya.toLowerCase().includes(searchTerm) ||
+                order.city.toLowerCase().includes(searchTerm);
             
             // Status filter
             const matchesStatus = !statusFilter || order.status === statusFilter;
@@ -365,6 +352,22 @@ class OrdersManager {
         });
         
         this.renderOrders();
+        
+        // Add search result count
+        this.updateSearchResults();
+    }
+    
+    updateSearchResults() {
+        const searchInput = document.getElementById('searchInput');
+        const resultCount = this.filteredOrders.length;
+        const totalCount = this.orders.length;
+        
+        // Update placeholder to show results
+        if (searchInput.value.trim()) {
+            searchInput.setAttribute('data-results', `${resultCount} résultat${resultCount > 1 ? 's' : ''}`);
+        } else {
+            searchInput.removeAttribute('data-results');
+        }
     }
     
     renderOrders() {
@@ -374,7 +377,7 @@ class OrdersManager {
         if (this.filteredOrders.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="10" style="text-align: center; padding: 2rem; color: var(--text-gray);">
+                    <td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-gray);">
                         ${window.langManager.t('noOrdersFound') || 'Aucune commande trouvée'}
                     </td>
                 </tr>
@@ -382,38 +385,113 @@ class OrdersManager {
             return;
         }
         
-        this.filteredOrders.forEach(order => {
+        this.filteredOrders.forEach((order, index) => {
             const row = document.createElement('tr');
             if (!order.isRead) {
                 row.classList.add('unread');
             }
             
+            // Extract first name only
+            const firstName = order.customerName.split(' ')[0];
+            
+            // Combine wilaya and city
+            const location = `${order.wilaya}, ${order.city}`;
+            
             row.innerHTML = `
-                <td><strong>${order.id}</strong></td>
-                <td>${order.customerName}</td>
+                <td><strong>${index + 1}</strong></td>
+                <td class="truncate" title="${order.customerName}">${firstName}</td>
                 <td class="desktop-only">${order.phone}</td>
-                <td class="desktop-only">${order.wilaya}</td>
-                <td>${order.product}</td>
+                <td class="desktop-only truncate" title="${location}">${location}</td>
+                <td class="truncate" title="${order.product}">${order.product}</td>
                 <td class="desktop-only">${order.quantity}</td>
                 <td class="desktop-only">€${order.total.toFixed(2)}</td>
                 <td class="desktop-only">${this.formatDate(order.date)}</td>
-                <td>${this.renderStatusBadge(order.status)}</td>
+                <td>${this.renderStatusDropdown(order.id, order.status)}</td>
                 <td>
                     <button class="action-btn" onclick="ordersManager.openOrderModal('${order.id}')">
-                        ${window.langManager.t('details')}
+                        <i class="fas fa-eye"></i>
                     </button>
                 </td>
             `;
             
             // Add click event to row
             row.addEventListener('click', (e) => {
-                if (!e.target.classList.contains('action-btn')) {
+                if (!e.target.closest('.action-btn') && !e.target.closest('.status-dropdown')) {
                     this.openOrderModal(order.id);
                 }
             });
             
             tbody.appendChild(row);
         });
+        
+        // Bind status dropdown events
+        this.bindStatusDropdowns();
+    }
+    
+    renderStatusDropdown(orderId, currentStatus) {
+        const statusOptions = {
+            new: { icon: 'fas fa-plus-circle', text: window.langManager.t('statusNew'), color: 'new' },
+            processing: { icon: 'fas fa-clock', text: window.langManager.t('statusProcessing'), color: 'processing' },
+            shipped: { icon: 'fas fa-truck', text: window.langManager.t('statusShipped'), color: 'shipped' },
+            completed: { icon: 'fas fa-check-circle', text: window.langManager.t('statusCompleted'), color: 'completed' },
+            cancelled: { icon: 'fas fa-times-circle', text: window.langManager.t('statusCancelled'), color: 'cancelled' }
+        };
+        
+        const currentOption = statusOptions[currentStatus];
+        
+        return `
+            <div class="status-dropdown" data-order-id="${orderId}">
+                <select class="status-select ${currentStatus}" onchange="ordersManager.updateOrderStatusFromTable('${orderId}', this.value)">
+                    ${Object.entries(statusOptions).map(([status, option]) => 
+                        `<option value="${status}" ${status === currentStatus ? 'selected' : ''}>${option.text}</option>`
+                    ).join('')}
+                </select>
+                <div class="status-display ${currentStatus}">
+                    <i class="${currentOption.icon}"></i>
+                    <span>${currentOption.text}</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    bindStatusDropdowns() {
+        // Add click handlers for status dropdowns
+        document.querySelectorAll('.status-dropdown').forEach(dropdown => {
+            const select = dropdown.querySelector('.status-select');
+            const display = dropdown.querySelector('.status-display');
+            
+            display.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('open');
+                
+                // Close other dropdowns
+                document.querySelectorAll('.status-dropdown').forEach(other => {
+                    if (other !== dropdown) {
+                        other.classList.remove('open');
+                    }
+                });
+            });
+        });
+        
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.status-dropdown')) {
+                document.querySelectorAll('.status-dropdown').forEach(dropdown => {
+                    dropdown.classList.remove('open');
+                });
+            }
+        });
+    }
+    
+    updateOrderStatusFromTable(orderId, newStatus) {
+        const order = this.orders.find(o => o.id === orderId);
+        if (order && order.status !== newStatus) {
+            order.status = newStatus;
+            this.saveOrders();
+            this.renderOrders();
+            this.updateStats();
+            this.showNotification(window.langManager.t('statusUpdated'));
+        }
     }
     
     renderStatusBadge(status) {
@@ -456,11 +534,11 @@ class OrdersManager {
     
     addTestOrder() {
         const testOrder = {
-            id: `ORD-${String(this.orders.length + 1).padStart(3, '0')}`,
-            customerName: 'Client Test',
-            phone: '+213 555 123 456',
+            id: String(this.orders.length + 1),
+            customerName: 'Client Test Nom',
+            phone: '+33 6 00 00 00 00',
             wilaya: 'Alger',
-            address: '123 Rue Test, Alger',
+            city: 'Alger Centre',
             product: 'Produit Test',
             variants: 'Variante Test',
             quantity: 1,
@@ -499,7 +577,7 @@ class OrdersManager {
     
     generateCSV() {
         const headers = [
-            'Order ID', 'Customer Name', 'Phone', 'Wilaya', 'Product', 
+            'N°', 'Customer Name', 'Phone', 'Wilaya', 'City', 'Product', 
             'Variants', 'Quantity', 'Total', 'Date', 'Status', 'Customer Notes', 'Seller Notes'
         ];
         
@@ -508,6 +586,7 @@ class OrdersManager {
             order.customerName,
             order.phone,
             order.wilaya,
+            order.city,
             order.product,
             order.variants,
             order.quantity,
@@ -553,20 +632,10 @@ class OrdersManager {
             this.callCustomer();
         });
         
-        // Status change buttons
-        document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('status-btn') || e.target.closest('.status-btn')) {
-                const btn = e.target.classList.contains('status-btn') ? e.target : e.target.closest('.status-btn');
-                const newStatus = btn.getAttribute('data-status');
-                this.updateOrderStatusTo(newStatus);
-            }
-        });
-        
         // Quick notes buttons
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('quick-note-btn') || e.target.closest('.quick-note-btn')) {
-                const btn = e.target.classList.contains('quick-note-btn') ? e.target : e.target.closest('.quick-note-btn');
-                const note = btn.getAttribute('data-note');
+            if (e.target.classList.contains('quick-note-btn')) {
+                const note = e.target.getAttribute('data-note');
                 this.addQuickNote(note);
             }
         });
@@ -611,18 +680,18 @@ class OrdersManager {
         document.getElementById('modalCustomerName').textContent = order.customerName;
         document.getElementById('modalCustomerPhone').textContent = order.phone;
         document.getElementById('modalCustomerWilaya').textContent = order.wilaya;
-        document.getElementById('modalCustomerAddress').textContent = order.address;
+        document.getElementById('modalCustomerCity').textContent = order.city;
         document.getElementById('modalOrderTotal').textContent = `€${order.total.toFixed(2)}`;
         
         // Order items
         const itemsContainer = document.getElementById('modalOrderItems');
         itemsContainer.innerHTML = `
-            <div class="item-details">
-                <div class="item-name">${order.product}</div>
-                <div class="item-variants">${order.variants}</div>
+            <div class="item-row">
+                <span>${order.product}</span>
+                <span>${order.variants}</span>
+                <span>${order.quantity}</span>
+                <span>€${order.total.toFixed(2)}</span>
             </div>
-            <div class="item-quantity">${order.quantity}</div>
-            <div class="item-price">€${order.total.toFixed(2)}</div>
         `;
         
         // Customer notes
@@ -638,9 +707,8 @@ class OrdersManager {
         // Seller notes
         document.getElementById('sellerNotesInput').value = order.sellerNotes || '';
         
-        // Update progress and status buttons
+        // Update progress
         this.updateOrderProgress(order.status);
-        this.updateStatusButtons(order.status);
     }
     
     updateOrderProgress(status) {
@@ -658,26 +726,16 @@ class OrdersManager {
         });
     }
     
-    updateStatusButtons(currentStatus) {
-        const buttons = document.querySelectorAll('.status-btn');
-        buttons.forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.getAttribute('data-status') === currentStatus) {
-                btn.classList.add('active');
-            }
-        });
-    }
-    
     copyOrderInfo() {
         if (!this.currentOrder) return;
         
         const order = this.currentOrder;
         const info = `
-Commande: ${order.id}
+Commande N°: ${order.id}
 Client: ${order.customerName}
 Téléphone: ${order.phone}
 Wilaya: ${order.wilaya}
-Adresse: ${order.address}
+Ville: ${order.city}
 Produit: ${order.product}
 Variantes: ${order.variants}
 Quantité: ${order.quantity}
@@ -694,18 +752,6 @@ ${order.customerNotes ? `Notes client: ${order.customerNotes}` : ''}
     
     printInvoice() {
         window.print();
-    }
-    
-    updateOrderStatusTo(newStatus) {
-        if (!this.currentOrder || this.currentOrder.status === newStatus) return;
-        
-        this.currentOrder.status = newStatus;
-        this.saveOrders();
-        this.renderOrders();
-        this.updateStats();
-        this.updateOrderProgress(newStatus);
-        this.updateStatusButtons(newStatus);
-        this.showNotification(window.langManager.t('statusUpdated'));
     }
     
     callCustomer() {
