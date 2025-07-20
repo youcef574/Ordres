@@ -67,13 +67,60 @@ class LanguageManager {
                 noteAdded: 'Note ajoutée avec succès !',
                 statusUpdated: 'Statut mis à jour !',
                 testOrderAdded: 'Commande test ajoutée !',
+                orderDeleted: 'Commande supprimée avec succès !',
+                confirmDelete: 'Êtes-vous sûr de vouloir supprimer cette commande ?',
+                whatsappSent: 'Message WhatsApp envoyé avec succès !',
+                invalidPhone: 'Numéro de téléphone invalide pour WhatsApp',
+                fillAllFields: 'Veuillez remplir tous les champs obligatoires',
+                orderAdded: 'Commande ajoutée avec succès !',
+                returnRequested: 'Demande de retour enregistrée',
+                exchangeRequested: 'Demande d\'échange enregistrée',
                 
                 // Status
                 statusNew: 'Nouveau',
                 statusProcessing: 'En cours',
                 statusShipped: 'Expédié',
                 statusCompleted: 'Terminé',
-                statusCancelled: 'Annulé'
+                statusCancelled: 'Annulé',
+                statusReturn: 'Retour',
+                statusExchange: 'Échange',
+                
+                // Buttons
+                print: 'Imprimer',
+                save: 'Sauvegarder',
+                close: 'Fermer',
+                delete: 'Supprimer',
+                confirm: 'Confirmer',
+                cancel: 'Annuler',
+                addManually: 'Ajouter manuellement',
+                saveOrder: 'Enregistrer',
+                cancelOrder: 'Annuler',
+                
+                // Form labels
+                customerName: 'Nom du client',
+                phone: 'Téléphone',
+                wilaya: 'Wilaya',
+                city: 'Commune',
+                product: 'Produit',
+                variants: 'Variantes',
+                quantity: 'Quantité',
+                totalPrice: 'Prix total (€)',
+                customerNotes: 'Notes du client',
+                addNewOrder: 'Ajouter une nouvelle commande',
+                
+                // Confirmation dialog
+                confirmDeleteTitle: 'Confirmer la suppression',
+                confirmDeleteMessage: 'Cette action est irréversible.',
+                
+                // WhatsApp messages
+                whatsappOrderUpdate: 'Mise à jour de votre commande',
+                whatsappGreeting: 'Bonjour',
+                whatsappOrderNumber: 'Commande #',
+                whatsappProduct: 'Produit:',
+                whatsappQuantity: 'Quantité:',
+                whatsappTotal: 'Total:',
+                whatsappThanks: 'Merci de votre confiance !',
+                whatsappSignature: 'YouzinElegancia'
             },
             en: {
                 // Header
@@ -116,7 +163,7 @@ class LanguageManager {
                 invoiceTitle: 'Invoice',
                 produit: 'Product',
               //  couleur: 'Color',
-                Variantes: 'variable',   
+                variantes: 'Variants',   
                 quantite: 'Quantity',
                 nom: 'Name',
                 telephone: 'Phone',
@@ -139,13 +186,60 @@ class LanguageManager {
                 noteAdded: 'Note added successfully!',
                 statusUpdated: 'Status updated!',
                 testOrderAdded: 'Test order added!',
+                orderDeleted: 'Order deleted successfully!',
+                confirmDelete: 'Are you sure you want to delete this order?',
+                whatsappSent: 'WhatsApp message sent successfully!',
+                invalidPhone: 'Invalid phone number for WhatsApp',
+                fillAllFields: 'Please fill all required fields',
+                orderAdded: 'Order added successfully!',
+                returnRequested: 'Return request recorded',
+                exchangeRequested: 'Exchange request recorded',
                 
                 // Status
                 statusNew: 'New',
                 statusProcessing: 'Processing',
                 statusShipped: 'Shipped',
                 statusCompleted: 'Completed',
-                statusCancelled: 'Cancelled'
+                statusCancelled: 'Cancelled',
+                statusReturn: 'Return',
+                statusExchange: 'Exchange',
+                
+                // Buttons
+                print: 'Print',
+                save: 'Save',
+                close: 'Close',
+                delete: 'Delete',
+                confirm: 'Confirm',
+                cancel: 'Cancel',
+                addManually: 'Add manually',
+                saveOrder: 'Save',
+                cancelOrder: 'Cancel',
+                
+                // Form labels
+                customerName: 'Customer name',
+                phone: 'Phone',
+                wilaya: 'Wilaya',
+                city: 'City',
+                product: 'Product',
+                variants: 'Variants',
+                quantity: 'Quantity',
+                totalPrice: 'Total price (€)',
+                customerNotes: 'Customer notes',
+                addNewOrder: 'Add new order',
+                
+                // Confirmation dialog
+                confirmDeleteTitle: 'Confirm deletion',
+                confirmDeleteMessage: 'This action is irreversible.',
+                
+                // WhatsApp messages
+                whatsappOrderUpdate: 'Your order update',
+                whatsappGreeting: 'Hello',
+                whatsappOrderNumber: 'Order #',
+                whatsappProduct: 'Product:',
+                whatsappQuantity: 'Quantity:',
+                whatsappTotal: 'Total:',
+                whatsappThanks: 'Thank you for your trust!',
+                whatsappSignature: 'YouzinElegancia'
             }
         };
         
@@ -455,7 +549,9 @@ class OrdersManager {
             processing: { icon: 'fas fa-clock', text: window.langManager.t('statusProcessing'), color: 'processing' },
             shipped: { icon: 'fas fa-truck', text: window.langManager.t('statusShipped'), color: 'shipped' },
             completed: { icon: 'fas fa-check-circle', text: window.langManager.t('statusCompleted'), color: 'completed' },
-            cancelled: { icon: 'fas fa-times-circle', text: window.langManager.t('statusCancelled'), color: 'cancelled' }
+            cancelled: { icon: 'fas fa-times-circle', text: window.langManager.t('statusCancelled'), color: 'cancelled' },
+            return: { icon: 'fas fa-undo', text: window.langManager.t('statusReturn'), color: 'return' },
+            exchange: { icon: 'fas fa-exchange-alt', text: window.langManager.t('statusExchange'), color: 'exchange' }
         };
         
         const currentOption = statusOptions[currentStatus];
@@ -507,6 +603,15 @@ class OrdersManager {
     updateOrderStatusFromTable(orderId, newStatus) {
         const order = this.orders.find(o => o.id === orderId);
         if (order && order.status !== newStatus) {
+            // Handle return/exchange status
+            if (newStatus === 'return' || newStatus === 'exchange') {
+                const typeText = newStatus === 'return' ? window.langManager.t('statusReturn') : window.langManager.t('statusExchange');
+                const currentNotes = order.sellerNotes || '';
+                const newNote = `🔄 ${typeText} ${window.langManager.t('returnRequested')}`;
+                order.sellerNotes = currentNotes ? `${currentNotes}\n${newNote}` : newNote;
+                this.showNotification(window.langManager.t(newStatus + 'Requested'));
+            }
+            
             order.status = newStatus;
             this.saveOrders();
             this.renderOrders();
@@ -524,7 +629,9 @@ class OrdersManager {
             processing: { icon: 'fas fa-clock', text: window.langManager.t('statusProcessing') },
             shipped: { icon: 'fas fa-truck', text: window.langManager.t('statusShipped') },
             completed: { icon: 'fas fa-check-circle', text: window.langManager.t('statusCompleted') },
-            cancelled: { icon: 'fas fa-times-circle', text: window.langManager.t('statusCancelled') }
+            cancelled: { icon: 'fas fa-times-circle', text: window.langManager.t('statusCancelled') },
+            return: { icon: 'fas fa-undo', text: window.langManager.t('statusReturn') },
+            exchange: { icon: 'fas fa-exchange-alt', text: window.langManager.t('statusExchange') }
         };
         
         const statusInfo = statusMap[status] || statusMap.new;
@@ -617,7 +724,7 @@ class OrdersManager {
         
         // Validation
         if (!customerName || !phone || !wilaya || !city || !product || !quantity || !total) {
-            this.showNotification('Veuillez remplir tous les champs obligatoires');
+            this.showNotification(window.langManager.t('fillAllFields'));
             return;
         }
         
@@ -645,55 +752,7 @@ class OrdersManager {
         this.updateStats();
         this.toggleManualOrderForm();
         
-        this.showNotification('Commande ajoutée avec succès !');
-    }
-    
-    toggleReturnExchangeSection() {
-        const section = document.getElementById('returnExchangeSection');
-        section.classList.toggle('show');
-        
-        if (!section.classList.contains('show')) {
-            // Clear form
-            document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
-            document.getElementById('returnReason').value = '';
-        }
-    }
-    
-    submitReturnExchange() {
-        const selectedOption = document.querySelector('.return-option.selected');
-        const reason = document.getElementById('returnReason').value.trim();
-        
-        if (!selectedOption) {
-            this.showNotification('Veuillez sélectionner le type de demande');
-            return;
-        }
-        
-        if (!reason) {
-            this.showNotification('Veuillez indiquer la raison');
-            return;
-        }
-        
-        const type = selectedOption.getAttribute('data-type');
-        const typeText = type === 'return' ? 'Retour' : 'Échange';
-        
-        // Add to seller notes
-        const currentNotes = document.getElementById('notesTextarea').value;
-        const newNote = `🔄 ${typeText} demandé: ${reason}`;
-        const updatedNotes = currentNotes ? `${currentNotes}\n${newNote}` : newNote;
-        
-        document.getElementById('notesTextarea').value = updatedNotes;
-        this.saveSellerNotes();
-        
-        // Update order status if needed
-        if (this.currentOrder) {
-            this.currentOrder.status = 'processing';
-            this.saveOrders();
-            this.renderOrders();
-            this.updateStats();
-        }
-        
-        this.toggleReturnExchangeSection();
-        this.showNotification(`Demande de ${typeText.toLowerCase()} enregistrée`);
+        this.showNotification(window.langManager.t('orderAdded'));
     }
     
     showDeleteConfirmation() {
@@ -718,7 +777,7 @@ class OrdersManager {
             this.updateStats();
             this.closeModal();
             this.hideDeleteConfirmation();
-            this.showNotification('Commande supprimée avec succès');
+            this.showNotification(window.langManager.t('orderDeleted'));
         }
     }
     
@@ -733,21 +792,23 @@ class OrdersManager {
         
         // Create status message
         const statusMessages = {
-            new: 'Votre commande a été reçue et est en cours de traitement.',
-            processing: 'Votre commande est en cours de préparation.',
-            shipped: 'Votre commande a été expédiée et est en route.',
-            completed: 'Votre commande a été livrée avec succès.',
-            cancelled: 'Votre commande a été annulée.'
+            new: window.langManager.currentLang === 'fr' ? 'Votre commande a été reçue et est en cours de traitement.' : 'Your order has been received and is being processed.',
+            processing: window.langManager.currentLang === 'fr' ? 'Votre commande est en cours de préparation.' : 'Your order is being prepared.',
+            shipped: window.langManager.currentLang === 'fr' ? 'Votre commande a été expédiée et est en route.' : 'Your order has been shipped and is on its way.',
+            completed: window.langManager.currentLang === 'fr' ? 'Votre commande a été livrée avec succès.' : 'Your order has been delivered successfully.',
+            cancelled: window.langManager.currentLang === 'fr' ? 'Votre commande a été annulée.' : 'Your order has been cancelled.',
+            return: window.langManager.currentLang === 'fr' ? 'Votre demande de retour a été enregistrée.' : 'Your return request has been recorded.',
+            exchange: window.langManager.currentLang === 'fr' ? 'Votre demande d\'échange a été enregistrée.' : 'Your exchange request has been recorded.'
         };
         
-        const message = `Bonjour ${order.customerName},\n\n` +
-                       `Mise à jour de votre commande #${order.id}:\n` +
+        const message = `${window.langManager.t('whatsappGreeting')} ${order.customerName},\n\n` +
+                       `${window.langManager.t('whatsappOrderUpdate')} #${order.id}:\n` +
                        `${statusMessages[newStatus]}\n\n` +
-                       `Produit: ${order.product}\n` +
-                       `Quantité: ${order.quantity}\n` +
-                       `Total: €${order.total}\n\n` +
-                       `Merci de votre confiance !\n` +
-                       `YouzinElegancia`;
+                       `${window.langManager.t('whatsappProduct')} ${order.product}\n` +
+                       `${window.langManager.t('whatsappQuantity')} ${order.quantity}\n` +
+                       `${window.langManager.t('whatsappTotal')} €${order.total}\n\n` +
+                       `${window.langManager.t('whatsappThanks')}\n` +
+                       `${window.langManager.t('whatsappSignature')}`;
         
         // Create WhatsApp URL
         const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
@@ -756,7 +817,7 @@ class OrdersManager {
         window.open(whatsappUrl, '_blank');
         
         // Show success message
-        this.showWhatsAppStatus('Message préparé pour WhatsApp');
+        this.showWhatsAppStatus(window.langManager.t('whatsappSent'));
     }
     
     formatPhoneForWhatsApp(phone) {
@@ -886,26 +947,6 @@ class OrdersManager {
         );
         
         // Return/Exchange functionality
-        document.getElementById('returnExchangeBtn').addEventListener('click', () => {
-            this.toggleReturnExchangeSection();
-        });
-        
-        document.getElementById('submitReturnExchange').addEventListener('click', () => {
-            this.submitReturnExchange();
-        });
-        
-        document.getElementById('cancelReturnExchange').addEventListener('click', () => {
-            this.toggleReturnExchangeSection();
-        });
-        
-        // Return option selection
-        document.querySelectorAll('.return-option').forEach(option => {
-            option.addEventListener('click', (e) => {
-                document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
-                e.target.classList.add('selected');
-            });
-        });
-        
         // Delete order functionality
         document.getElementById('deleteOrderBtn').addEventListener('click', () => {
             this.showDeleteConfirmation();
