@@ -854,7 +854,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -863,6 +863,7 @@ body {
     visibility: hidden;
     transition: var(--transition-normal);
     padding: var(--spacing-md);
+    backdrop-filter: blur(4px);
 }
 
 .modal-overlay.show {
@@ -872,14 +873,15 @@ body {
 
 .invoice-modal {
     background: var(--bg-white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
     width: 100%;
-    max-width: 900px;
+    max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
     transform: scale(0.9);
     transition: var(--transition-normal);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .modal-overlay.show .invoice-modal {
@@ -887,95 +889,105 @@ body {
 }
 
 .modal-header {
-    padding: var(--spacing-lg);
-    border-bottom: 1px solid #e5e7eb;
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
     background: var(--bg-white);
     color: var(--text-black);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border-radius: 16px 16px 0 0;
     position: relative;
     text-align: center;
 }
 
 .modal-header h2 {
-    font-size: 1.75rem;
-    font-weight: 600;
+    font-size: 1.5rem;
+    font-weight: 700;
     margin: 0;
     color: var(--text-black);
+    letter-spacing: -0.025em;
 }
 
 .modal-close {
     position: absolute;
-    top: var(--spacing-md);
-    right: var(--spacing-md);
-    background: var(--bg-light-gray);
+    top: 1rem;
+    right: 1rem;
+    background: #f8fafc;
     border: none;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     cursor: pointer;
-    color: var(--text-black);
-    padding: var(--spacing-sm);
-    border-radius: var(--radius-sm);
+    color: #64748b;
+    padding: 0.5rem;
+    border-radius: 8px;
     transition: var(--transition-fast);
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid #e2e8f0;
 }
 
 .modal-close:hover {
-    background: #e5e7eb;
-    transform: scale(1.1);
+    background: #f1f5f9;
+    color: #475569;
+    transform: scale(1.05);
 }
 
 /* Invoice Fields */
+.modal-body {
+    padding: 0;
+}
+
 .invoice-fields {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
+    gap: 0;
+    padding: 1.5rem;
+    padding-bottom: 0;
 }
 
 .field-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--spacing-md);
-    border-bottom: 1px solid #f1f5f9;
+    padding: 0.875rem 0;
+    border-bottom: 1px solid #f8fafc;
     transition: background-color var(--transition-fast);
 }
 
-.field-row:hover {
-    background: var(--bg-light-gray);
+.field-row:last-child {
+    border-bottom: none;
 }
 
 .field-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-black);
-    min-width: 150px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #475569;
+    min-width: 140px;
 }
 
 .field-value {
-    font-size: 1rem;
-    color: var(--text-black);
-    font-weight: 500;
+    font-size: 0.9rem;
+    color: #1e293b;
+    font-weight: 600;
     text-align: right;
+    flex: 1;
 }
 
 /* Separator */
 .separator {
-    height: 2px;
-    background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
-    margin: var(--spacing-lg) 0;
-    border-radius: 1px;
+    height: 1px;
+    background: #e2e8f0;
+    margin: 1.5rem;
+    margin-bottom: 0;
 }
 
 /* Total Section */
 .total-section {
-    background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
-    padding: var(--spacing-lg);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--spacing-lg);
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem;
+    margin-bottom: 0;
+    border-radius: 12px;
 }
 
 .total-row {
@@ -985,15 +997,13 @@ body {
 }
 
 .total-label {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: 1.125rem;
+    font-weight: 700;
     color: white;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
 }
 
 .total-value {
-    font-size: 1.5rem;
+    font-size: 1.375rem;
     font-weight: 700;
     color: white;
 }
@@ -1001,24 +1011,61 @@ body {
 /* Action Buttons */
 .action-buttons {
     display: flex;
-    justify-content: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    padding-top: 1.5rem;
 }
 
 .action-buttons .btn {
-    min-width: 150px;
+    flex: 1;
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.action-buttons .btn-primary {
+    background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.action-buttons .btn-primary:hover {
+    background: linear-gradient(135deg, var(--purple-dark) 0%, #5b21b6 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+}
+
+.action-buttons .btn-secondary {
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.action-buttons .btn-secondary:hover {
+    background: #f1f5f9;
+    color: #334155;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Notes Section */
 .notes-section {
-    background: var(--bg-light-gray);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-lg);
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin: 0 1.5rem 1.5rem 1.5rem;
     display: none;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: 1rem;
+    border: 1px solid #e2e8f0;
 }
 
 .notes-section.show {
@@ -1027,20 +1074,21 @@ body {
 
 .notes-section textarea {
     width: 100%;
-    min-height: 100px;
-    padding: var(--spacing-md);
-    border: 1px solid #e5e7eb;
-    border-radius: var(--radius-md);
-    font-size: 0.875rem;
+    min-height: 80px;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.9rem;
     font-family: inherit;
     resize: vertical;
     transition: var(--transition-fast);
+    background: white;
 }
 
 .notes-section textarea:focus {
     outline: none;
-    border-color: var(--purple);
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .quick-notes {
@@ -1050,21 +1098,21 @@ body {
 }
 
 .quick-note-btn {
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border: 1px solid #e5e7eb;
-    border-radius: var(--radius-sm);
-    background: var(--bg-white);
-    color: var(--text-black);
-    font-size: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    color: #374151;
+    font-size: 0.8rem;
     cursor: pointer;
     transition: var(--transition-fast);
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .quick-note-btn:hover {
-    background: var(--purple);
+    background: #3b82f6;
     color: white;
-    border-color: var(--purple);
+    border-color: #3b82f6;
     transform: translateY(-1px);
 }
 
@@ -1156,13 +1204,40 @@ body {
     }
     
     .invoice-modal {
-        margin: var(--spacing-sm);
+        margin: 1rem;
         max-width: calc(100vw - 2rem);
+        max-height: calc(100vh - 2rem);
     }
     
     .action-buttons {
         flex-direction: column;
-        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .action-buttons .btn {
+        padding: 1rem;
+        font-size: 1rem;
+    }
+    
+    .modal-header {
+        padding: 1.25rem;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.375rem;
+    }
+    
+    .invoice-fields {
+        padding: 1.25rem;
+    }
+    
+    .total-section {
+        margin: 1.25rem;
+        margin-bottom: 0;
+    }
+    
+    .notes-section {
+        margin: 0 1.25rem 1.25rem 1.25rem;
     }
 }
 
@@ -1204,7 +1279,7 @@ body {
     }
     
     .invoice-modal {
-        max-width: 700px;
+        max-width: 520px;
     }
 }
 
@@ -1227,7 +1302,7 @@ body {
     }
     
     .invoice-modal {
-        max-width: 800px;
+        max-width: 540px;
     }
     
     .orders-table {
