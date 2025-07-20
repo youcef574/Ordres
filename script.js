@@ -44,7 +44,7 @@ class LanguageManager {
                 invoiceTitle: 'Facture de clients',
                 invoiceTitle: 'Facture',
                 produit: 'Produit',
-                couleur: 'Couleur',
+                variantes: 'Variantes',
                 quantite: 'Quantité',
                 nom: 'Nom',
                 telephone: 'Téléphone',
