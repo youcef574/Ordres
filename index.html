@@ -117,6 +117,8 @@
                         <option value="shipped" data-key="shipped">Expédié</option>
                         <option value="completed" data-key="completed">Terminé</option>
                         <option value="cancelled" data-key="cancelled">Annulé</option>
+                        <option value="return" data-key="statusReturn">Retour</option>
+                        <option value="exchange" data-key="statusExchange">Échange</option>
                     </select>
                 </div>
                 
@@ -141,55 +143,55 @@
                 
                 <button class="btn btn-secondary" id="addManualOrderBtn">
                     <i class="fas fa-edit"></i>
-                    <span>Ajouter manuellement</span>
+                    <span data-key="addManually">Ajouter manuellement</span>
                 </button>
             </div>
         </div>
 
         <!-- Manual Order Form -->
         <div class="manual-order-form" id="manualOrderForm">
-            <h3 style="margin-bottom: 1rem; color: #374151;">Ajouter une nouvelle commande</h3>
+            <h3 style="margin-bottom: 1rem; color: #374151;" data-key="addNewOrder">Ajouter une nouvelle commande</h3>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="manualCustomerName">Nom du client</label>
+                    <label for="manualCustomerName" data-key="customerName">Nom du client</label>
                     <input type="text" id="manualCustomerName" required>
                 </div>
                 <div class="form-group">
-                    <label for="manualPhone">Téléphone</label>
+                    <label for="manualPhone" data-key="phone">Téléphone</label>
                     <input type="tel" id="manualPhone" required>
                 </div>
                 <div class="form-group">
-                    <label for="manualWilaya">Wilaya</label>
+                    <label for="manualWilaya" data-key="wilaya">Wilaya</label>
                     <input type="text" id="manualWilaya" required>
                 </div>
                 <div class="form-group">
-                    <label for="manualCity">Commune</label>
+                    <label for="manualCity" data-key="city">Commune</label>
                     <input type="text" id="manualCity" required>
                 </div>
                 <div class="form-group">
-                    <label for="manualProduct">Produit</label>
+                    <label for="manualProduct" data-key="product">Produit</label>
                     <input type="text" id="manualProduct" required>
                 </div>
                 <div class="form-group">
-                    <label for="manualVariants">Variantes</label>
+                    <label for="manualVariants" data-key="variants">Variantes</label>
                     <input type="text" id="manualVariants">
                 </div>
                 <div class="form-group">
-                    <label for="manualQuantity">Quantité</label>
+                    <label for="manualQuantity" data-key="quantity">Quantité</label>
                     <input type="number" id="manualQuantity" min="1" value="1" required>
                 </div>
                 <div class="form-group">
-                    <label for="manualTotal">Prix total (€)</label>
+                    <label for="manualTotal" data-key="totalPrice">Prix total (€)</label>
                     <input type="number" id="manualTotal" step="0.01" required>
                 </div>
             </div>
             <div class="form-group" style="margin-bottom: 1rem;">
-                <label for="manualNotes">Notes du client</label>
+                <label for="manualNotes" data-key="customerNotes">Notes du client</label>
                 <textarea id="manualNotes" rows="3" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 6px;"></textarea>
             </div>
             <div class="form-actions">
-                <button class="btn btn-secondary" id="cancelManualOrder">Annuler</button>
-                <button class="btn btn-primary" id="saveManualOrder">Enregistrer</button>
+                <button class="btn btn-secondary" id="cancelManualOrder" data-key="cancelOrder">Annuler</button>
+                <button class="btn btn-primary" id="saveManualOrder" data-key="saveOrder">Enregistrer</button>
             </div>
         </div>
 
@@ -229,13 +231,13 @@
                 <div class="modal-header-content">
                     <h2 data-key="invoiceTitle">Confirmation de Commande</h2>
                     <div class="modal-header-actions">
-                        <button class="modal-action-btn print-btn" id="printBtn" title="طباعة">
+                        <button class="modal-action-btn print-btn" id="printBtn" data-key="print" title="Imprimer">
                             <i class="fas fa-print"></i>
                         </button>
-                        <button class="modal-action-btn save-btn" id="saveBtn" title="حفظ كصورة">
+                        <button class="modal-action-btn save-btn" id="saveBtn" data-key="save" title="Sauvegarder">
                             <i class="fas fa-download"></i>
                         </button>
-                        <button class="modal-action-btn modal-close" id="modalClose" title="إغلاق">
+                        <button class="modal-action-btn modal-close" id="modalClose" data-key="close" title="Fermer">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -250,7 +252,7 @@
                         <span class="field-value" id="produitValue">-</span>
                     </div>
                     <div class="field-row">
-                        <span class="field-label" data-key="couleur">Variantes</span>
+                        <span class="field-label" data-key="variantes">Variantes</span>
                         <span class="field-value" id="couleurValue">-</span>
                     </div>
                     <div class="field-row">
@@ -295,22 +297,10 @@
                 <div class="action-buttons">
                     <button class="btn btn-primary" id="callBtn" data-key="callClient">📞 Appeler le client</button>
                     <button class="btn btn-secondary" id="addNotesBtn" data-key="memos">📝 Mémos / Notes</button>
-                    <button class="btn btn-secondary" id="returnExchangeBtn">🔄 Retour/Échange</button>
-                    <button class="btn btn-danger" id="deleteOrderBtn">🗑️ Supprimer</button>
-                </div>
-                
-                <!-- Return/Exchange Section -->
-                <div class="return-exchange-section" id="returnExchangeSection">
-                    <h4>Demande de retour/échange</h4>
-                    <div class="return-options">
-                        <button class="return-option" data-type="return">Retour</button>
-                        <button class="return-option" data-type="exchange">Échange</button>
-                    </div>
-                    <textarea class="return-reason" id="returnReason" placeholder="Raison du retour/échange..."></textarea>
-                    <div style="margin-top: 0.75rem;">
-                        <button class="btn btn-primary" id="submitReturnExchange">Confirmer</button>
-                        <button class="btn btn-secondary" id="cancelReturnExchange">Annuler</button>
-                    </div>
+                    <button class="btn btn-danger" id="deleteOrderBtn">
+                        <i class="fas fa-trash"></i>
+                        <span data-key="delete">Supprimer</span>
+                    </button>
                 </div>
                 
                 <!-- WhatsApp Status -->
@@ -340,11 +330,14 @@
     <!-- Confirmation Dialog -->
     <div class="confirmation-dialog" id="confirmationDialog">
         <div class="confirmation-content">
-            <h3>Confirmer la suppression</h3>
-            <p>Êtes-vous sûr de vouloir supprimer cette commande ? Cette action est irréversible.</p>
+            <h3 data-key="confirmDeleteTitle">Confirmer la suppression</h3>
+            <p>
+                <span data-key="confirmDelete">Êtes-vous sûr de vouloir supprimer cette commande ?</span>
+                <span data-key="confirmDeleteMessage">Cette action est irréversible.</span>
+            </p>
             <div class="confirmation-actions">
-                <button class="btn btn-secondary" id="cancelDelete">Annuler</button>
-                <button class="btn btn-danger" id="confirmDelete">Supprimer</button>
+                <button class="btn btn-secondary" id="cancelDelete" data-key="cancel">Annuler</button>
+                <button class="btn btn-danger" id="confirmDelete" data-key="confirm">Supprimer</button>
             </div>
         </div>
     </div>
@@ -352,4 +345,5 @@
     <script src="script.js"></script>
 </body>
                             </html>
-                            
+
+                        
