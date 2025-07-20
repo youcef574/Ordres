@@ -42,18 +42,19 @@ class LanguageManager {
                 
                 // Modal
                 invoiceTitle: 'Facture de clients',
-                produits: 'Produits',
-                variantes: 'Variantes',
+                invoiceTitle: 'Facture',
+                produit: 'Produit',
+                couleur: 'Couleur',
                 quantite: 'Quantité',
                 nom: 'Nom',
                 telephone: 'Téléphone',
                 wilaya: 'Wilaya',
                 commune: 'Commune',
-                prixProduits: 'Prix produits',
+                prixProduit: 'Prix produit',
                 fraisLivraison: 'Frais de livraison',
-                totalPrice: 'Total',
-                callByPhone: 'Call by phone',
-                addNotes: 'Add notes',
+                total: 'Total',
+                callClient: '📞 Appeler le client',
+                memos: '📝 Mémos / Notes',
                 noAnswer: '❌ N\'a pas répondu',
                 called: '☎ Appelé avec succès',
                 callLater: '⏳ Rappeler plus tard',
@@ -112,19 +113,19 @@ class LanguageManager {
                 action: 'action',
                 
                 // Modal
-                invoiceTitle: 'Customer Invoice',
-                produits: 'Products',
-                variantes: 'Variants',
+                invoiceTitle: 'Invoice',
+                produit: 'Product',
+                couleur: 'Color',
                 quantite: 'Quantity',
                 nom: 'Name',
                 telephone: 'Phone',
                 wilaya: 'Wilaya',
                 commune: 'City',
-                prixProduits: 'Product price',
+                prixProduit: 'Product price',
                 fraisLivraison: 'Delivery fees',
-                totalPrice: 'Total',
-                callByPhone: 'Call by phone',
-                addNotes: 'Add notes',
+                total: 'Total',
+                callClient: '📞 Call client',
+                memos: '📝 Memos / Notes',
                 noAnswer: '❌ No answer',
                 called: '☎ Called successfully',
                 callLater: '⏳ Call back later',
@@ -689,26 +690,9 @@ class OrdersManager {
     }
     
     populateModal(order) {
-        // Update modal title
-        document.getElementById('modalTitle').textContent = window.langManager.t('invoiceTitle');
-        
-        // Update field labels
-        document.getElementById('produitsLabel').textContent = window.langManager.t('produits');
-        document.getElementById('variantesLabel').textContent = window.langManager.t('variantes');
-        document.getElementById('quantiteLabel').textContent = window.langManager.t('quantite');
-        document.getElementById('nomLabel').textContent = window.langManager.t('nom');
-        document.getElementById('telephoneLabel').textContent = window.langManager.t('telephone');
-        document.getElementById('wilayaLabel').textContent = window.langManager.t('wilaya');
-        document.getElementById('communeLabel').textContent = window.langManager.t('commune');
-        document.getElementById('prixProduitsLabel').textContent = window.langManager.t('prixProduits');
-        document.getElementById('fraisLivraisonLabel').textContent = window.langManager.t('fraisLivraison');
-        document.getElementById('totalLabel').textContent = window.langManager.t('totalPrice');
-        document.getElementById('callBtn').textContent = window.langManager.t('callByPhone');
-        document.getElementById('addNotesBtn').textContent = window.langManager.t('addNotes');
-        
         // Update field values
-        document.getElementById('produitsValue').textContent = order.product;
-        document.getElementById('variantesValue').textContent = order.variants;
+        document.getElementById('produitValue').textContent = order.product;
+        document.getElementById('couleurValue').textContent = order.variants;
         document.getElementById('quantiteValue').textContent = order.quantity;
         document.getElementById('nomValue').textContent = order.customerName;
         document.getElementById('telephoneValue').textContent = order.phone;
@@ -719,7 +703,7 @@ class OrdersManager {
         const productPrice = order.total * 0.9; // Assuming 90% is product, 10% is delivery
         const deliveryFee = order.total * 0.1;
         
-        document.getElementById('prixProduitsValue').textContent = `€${productPrice.toFixed(2)}`;
+        document.getElementById('prixProduitValue').textContent = `€${productPrice.toFixed(2)}`;
         document.getElementById('fraisLivraisonValue').textContent = `€${deliveryFee.toFixed(2)}`;
         document.getElementById('totalValue').textContent = `€${order.total.toFixed(2)}`;
         
