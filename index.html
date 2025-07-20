@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Commandes - YouzinElegancia</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <a href="#" class="logo">
+                    <i class="fas fa-gem"></i>
+                    <span>YouzinElegancia</span>
+                </a>
+            </div>
+            
+            <div class="header-right">
+                <button class="lang-toggle" id="langToggle">
+                    <i class="fas fa-globe"></i>
+                    <span id="langText">Français</span>
+                </button>
+                
+                <div class="user-menu">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-user-circle"></i>
+                    </button>
+                    
+                    <div class="dropdown-menu" id="dropdownMenu">
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span data-key="dashboard">Tableau de bord</span>
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span data-key="settings">Paramètres</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item text-danger">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span data-key="logout">Déconnexion</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Title -->
+        <div class="page-header">
+            <h1 data-key="pageTitle">Gestion des Commandes</h1>
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon new">
+                        <i class="fas fa-plus-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="newOrdersCount">4</span>
+                        <span class="stat-label" data-key="newOrders">Nouvelles</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon processing">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="processingOrdersCount">7</span>
+                        <span class="stat-label" data-key="processing">En cours</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon shipped">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="shippedOrdersCount">12</span>
+                        <span class="stat-label" data-key="shipped">Expédiées</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon completed">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <span class="stat-number" id="completedOrdersCount">23</span>
+                        <span class="stat-label" data-key="completed">Terminées</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" data-key-placeholder="searchPlaceholder" placeholder="Rechercher par nom, téléphone ou numéro de commande...">
+                </div>
+            </div>
+            
+            <div class="toolbar-right">
+                <div class="filter-group">
+                    <select id="statusFilter" class="filter-select">
+                        <option value="" data-key="allStatuses">Tous les statuts</option>
+                        <option value="new" data-key="new">Nouveau</option>
+                        <option value="processing" data-key="processing">En cours</option>
+                        <option value="shipped" data-key="shipped">Expédié</option>
+                        <option value="completed" data-key="completed">Terminé</option>
+                        <option value="cancelled" data-key="cancelled">Annulé</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <input type="date" id="dateFrom" class="date-input">
+                    <span data-key="to">à</span>
+                    <input type="date" id="dateTo" class="date-input">
+                </div>
+                
+                <button class="btn btn-secondary" id="exportBtn">
+                    <i class="fas fa-download"></i>
+                    <span data-key="export">Exporter</span>
+                </button>
+                
+                <button class="btn btn-primary" id="addTestOrderBtn">
+                    <i class="fas fa-plus"></i>
+                    <span data-key="addTestOrder">Commande test</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="table-container">
+            <table class="orders-table" id="ordersTable">
+                <thead>
+                    <tr>
+                        <th data-key="orderNumber">N° Commande</th>
+                        <th data-key="customerName">Nom du client</th>
+                        <th class="desktop-only" data-key="phone">Téléphone</th>
+                        <th class="desktop-only" data-key="address">Adresse</th>
+                        <th data-key="product">Produit</th>
+                        <th class="desktop-only" data-key="quantity">Quantité</th>
+                        <th class="desktop-only" data-key="total">Total</th>
+                        <th class="desktop-only" data-key="date">Date</th>
+                        <th data-key="status">Statut</th>
+                        <th data-key="actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <!-- Orders will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Order Details Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="orderModal">
+            <div class="modal-header">
+                <h2 data-key="orderDetails">Détails de la commande</h2>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="invoice-container">
+                    <!-- Order Progress -->
+                    <div class="order-progress">
+                        <div class="progress-step active" data-status="new">
+                            <div class="step-icon">
+                                <i class="fas fa-plus-circle"></i>
+                            </div>
+                            <span data-key="new">Nouveau</span>
+                        </div>
+                        <div class="progress-step" data-status="processing">
+                            <div class="step-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <span data-key="processing">En cours</span>
+                        </div>
+                        <div class="progress-step" data-status="shipped">
+                            <div class="step-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <span data-key="shipped">Expédié</span>
+                        </div>
+                        <div class="progress-step" data-status="completed">
+                            <div class="step-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <span data-key="completed">Terminé</span>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Header -->
+                    <div class="invoice-header">
+                        <div class="invoice-title">
+                            <h3 data-key="invoice">Facture</h3>
+                            <span class="order-id" id="modalOrderId">#12345</span>
+                        </div>
+                        <div class="invoice-date">
+                            <span data-key="date">Date:</span>
+                            <span id="modalOrderDate">2024-01-15</span>
+                        </div>
+                    </div>
+
+                    <!-- Customer Information -->
+                    <div class="customer-info">
+                        <h4 data-key="customerInfo">Informations client</h4>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label data-key="customerName">Nom complet:</label>
+                                <span id="modalCustomerName">Jean Dupont</span>
+                            </div>
+                            <div class="info-item">
+                                <label data-key="phone">Téléphone:</label>
+                                <div class="phone-container">
+                                    <span id="modalCustomerPhone">+33 6 12 34 56 78</span>
+                                    <button class="btn-call" id="callBtn">
+                                        <i class="fas fa-phone"></i>
+                                        <span data-key="callNow">Appeler</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <label data-key="address">Adresse:</label>
+                                <span id="modalCustomerAddress">123 Rue de la Paix, 75001 Paris</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="order-items">
+                        <h4 data-key="orderItems">Articles commandés</h4>
+                        <div class="items-table">
+                            <div class="item-row header">
+                                <span data-key="product">Produit</span>
+                                <span data-key="variants">Variantes</span>
+                                <span data-key="quantity">Quantité</span>
+                                <span data-key="price">Prix</span>
+                            </div>
+                            <div class="item-row" id="modalOrderItems">
+                                <!-- Items will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="order-total">
+                            <span data-key="total">Total:</span>
+                            <span class="total-amount" id="modalOrderTotal">€89.99</span>
+                        </div>
+                    </div>
+
+                    <!-- Customer Notes -->
+                    <div class="customer-notes" id="customerNotesSection">
+                        <h4 data-key="customerNotes">Notes du client</h4>
+                        <p id="modalCustomerNotes">Livraison rapide s'il vous plaît</p>
+                    </div>
+
+                    <!-- Seller Notes -->
+                    <div class="seller-notes">
+                        <h4 data-key="sellerNotes">Notes internes</h4>
+                        <div class="notes-input-container">
+                            <textarea id="sellerNotesInput" data-key-placeholder="sellerNotesPlaceholder" placeholder="Ajouter des notes internes..."></textarea>
+                            <div class="quick-notes">
+                                <button class="quick-note-btn" data-note="❌ N'a pas répondu">
+                                    <span data-key="noAnswer">❌ N'a pas répondu</span>
+                                </button>
+                                <button class="quick-note-btn" data-note="☎ Appelé avec succès">
+                                    <span data-key="called">☎ Appelé avec succès</span>
+                                </button>
+                                <button class="quick-note-btn" data-note="⏳ Rappeler plus tard">
+                                    <span data-key="callLater">⏳ Rappeler plus tard</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="copyInfoBtn">
+                    <i class="fas fa-copy"></i>
+                    <span data-key="copyInfo">Copier infos</span>
+                </button>
+                <button class="btn btn-secondary" id="printInvoiceBtn">
+                    <i class="fas fa-print"></i>
+                    <span data-key="printInvoice">Imprimer</span>
+                </button>
+                <button class="btn btn-primary" id="updateStatusBtn">
+                    <i class="fas fa-edit"></i>
+                    <span data-key="updateStatus">Mettre à jour</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
