@@ -115,7 +115,7 @@ class LanguageManager {
                 // Modal
                 invoiceTitle: 'Invoice',
                 produit: 'Product',
-                couleur: 'Color',
+              //  couleur: 'Color',
                 Variantes: 'variable',   
                 quantite: 'Quantity',
                 nom: 'Name',
