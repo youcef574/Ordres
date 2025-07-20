@@ -649,6 +649,15 @@ class OrdersManager {
             this.toggleNotesSection();
         });
         
+        // Print and Save buttons
+        document.getElementById('printBtn').addEventListener('click', () => {
+            this.printModal();
+        });
+        
+        document.getElementById('saveBtn').addEventListener('click', () => {
+            this.saveModalAsImage();
+        });
+        
         // Quick notes buttons
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('quick-note-btn')) {
@@ -740,6 +749,96 @@ class OrdersManager {
         const notes = document.getElementById('notesTextarea').value;
         this.currentOrder.sellerNotes = notes;
         this.saveOrders();
+    }
+    
+    printModal() {
+        // Hide action buttons and header actions during print
+        const actionButtons = document.querySelector('.action-buttons');
+        const headerActions = document.querySelector('.modal-header-actions');
+        const originalActionDisplay = actionButtons.style.display;
+        const originalHeaderDisplay = headerActions.style.display;
+        
+        actionButtons.style.display = 'none';
+        headerActions.style.display = 'none';
+        
+        // Print
+        window.print();
+        
+        // Restore buttons after print
+        setTimeout(() => {
+            actionButtons.style.display = originalActionDisplay;
+            headerActions.style.display = originalHeaderDisplay;
+        }, 1000);
+    }
+    
+    async saveModalAsImage() {
+        try {
+            // Show loading state
+            const saveBtn = document.getElementById('saveBtn');
+            const originalContent = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            saveBtn.disabled = true;
+            
+            // Import html2canvas dynamically
+            if (!window.html2canvas) {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                document.head.appendChild(script);
+                
+                await new Promise((resolve) => {
+                    script.onload = resolve;
+                });
+            }
+            
+            // Get the modal content
+            const modal = document.querySelector('.invoice-modal');
+            
+            // Hide action buttons temporarily
+            const actionButtons = document.querySelector('.action-buttons');
+            const headerActions = document.querySelector('.modal-header-actions');
+            const originalActionDisplay = actionButtons.style.display;
+            const originalHeaderDisplay = headerActions.style.display;
+            
+            actionButtons.style.display = 'none';
+            headerActions.style.display = 'none';
+            
+            // Capture the modal
+            const canvas = await html2canvas(modal, {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                width: modal.offsetWidth,
+                height: modal.offsetHeight
+            });
+            
+            // Restore buttons
+            actionButtons.style.display = originalActionDisplay;
+            headerActions.style.display = originalHeaderDisplay;
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.download = `invoice-${this.currentOrder.id}-${new Date().toISOString().split('T')[0]}.png`;
+            link.href = canvas.toDataURL('image/png');
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success notification
+            this.showNotification('تم حفظ الفاتورة كصورة بنجاح!');
+            
+        } catch (error) {
+            console.error('Error saving modal as image:', error);
+            this.showNotification('حدث خطأ أثناء حفظ الصورة');
+        } finally {
+            // Restore button
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.innerHTML = originalContent;
+            saveBtn.disabled = false;
+        }
     }
     
     showNotification(message) {
