@@ -377,7 +377,7 @@ class OrdersManager {
         if (this.filteredOrders.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-gray);">
+                    <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-gray);">
                         ${window.langManager.t('noOrdersFound') || 'Aucune commande trouvée'}
                     </td>
                 </tr>
@@ -394,20 +394,12 @@ class OrdersManager {
             // Extract first name only
             const firstName = order.customerName.split(' ')[0];
             
-            // Combine wilaya and city
-            const location = `${order.wilaya}, ${order.city}`;
-            
             row.innerHTML = `
-                <td><strong>${index + 1}</strong></td>
-                <td class="truncate" title="${order.customerName}">${firstName}</td>
-                <td class="desktop-only">${order.phone}</td>
-                <td class="desktop-only truncate" title="${location}">${location}</td>
-                <td class="truncate" title="${order.product}">${order.product}</td>
-                <td class="desktop-only">${order.quantity}</td>
-                <td class="desktop-only">€${order.total.toFixed(2)}</td>
-                <td class="desktop-only">${this.formatDate(order.date)}</td>
-                <td>${this.renderStatusDropdown(order.id, order.status)}</td>
-                <td>
+                <td class="col-id"><strong>${index + 1}</strong></td>
+                <td class="col-nom truncate" title="${order.customerName}">${firstName}</td>
+                <td class="col-produit truncate" title="${order.product}">${order.product}</td>
+                <td class="col-statut">${this.renderStatusDropdown(order.id, order.status)}</td>
+                <td class="col-action">
                     <button class="action-btn" onclick="ordersManager.openOrderModal('${order.id}')">
                         <i class="fas fa-eye"></i>
                     </button>
@@ -972,6 +964,22 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add loading states
     document.body.classList.add('loaded');
+    
+    // Show scroll hint on mobile
+    const scrollHint = document.getElementById('scrollHint');
+    if (scrollHint && window.innerWidth <= 768) {
+        scrollHint.classList.add('show');
+        
+        // Hide after 4 seconds or on scroll
+        const hideHint = () => {
+            scrollHint.classList.remove('show');
+        };
+        
+        setTimeout(hideHint, 4000);
+        
+        const tableContainer = document.querySelector('.table-container');
+        tableContainer.addEventListener('scroll', hideHint, { once: true });
+    }
     
     // Service Worker registration for PWA capabilities
     if ('serviceWorker' in navigator) {
