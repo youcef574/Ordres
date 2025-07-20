@@ -174,7 +174,7 @@
     <div class="modal-overlay" id="modalOverlay">
         <div class="invoice-modal" id="orderModal">
             <div class="modal-header">
-                <h2 id="modalTitle" data-key="invoiceTitle">Facture de clients</h2>
+                <h2 data-key="invoiceTitle">Facture</h2>
                 <button class="modal-close" id="modalClose">
                     <i class="fas fa-times"></i>
                 </button>
@@ -183,39 +183,39 @@
             <div class="modal-body">
                 <div class="invoice-fields">
                     <div class="field-row">
-                        <span class="field-label" id="produitsLabel">Produits</span>
-                        <span class="field-value" id="produitsValue">-</span>
+                        <span class="field-label" data-key="produit">Produit</span>
+                        <span class="field-value" id="produitValue">-</span>
                     </div>
                     <div class="field-row">
-                        <span class="field-label" id="variantesLabel">Variantes</span>
-                        <span class="field-value" id="variantesValue">-</span>
+                        <span class="field-label" data-key="couleur">Couleur</span>
+                        <span class="field-value" id="couleurValue">-</span>
                     </div>
                     <div class="field-row">
-                        <span class="field-label" id="quantiteLabel">Quantité</span>
+                        <span class="field-label" data-key="quantite">Quantité</span>
                         <span class="field-value" id="quantiteValue">-</span>
                     </div>
                     <div class="field-row">
-                        <span class="field-label" id="nomLabel">Nom</span>
+                        <span class="field-label" data-key="nom">Nom</span>
                         <span class="field-value" id="nomValue">-</span>
                     </div>
                     <div class="field-row">
-                        <span class="field-label" id="telephoneLabel">Téléphone</span>
+                        <span class="field-label" data-key="telephone">Téléphone</span>
                         <span class="field-value" id="telephoneValue">-</span>
                     </div>
                     <div class="field-row">
-                        <span class="field-label" id="wilayaLabel">Wilaya</span>
+                        <span class="field-label" data-key="wilaya">Wilaya</span>
                         <span class="field-value" id="wilayaValue">-</span>
                     </div>
                     <div class="field-row">
-                        <span class="field-label" id="communeLabel">Commune</span>
+                        <span class="field-label" data-key="commune">Commune</span>
                         <span class="field-value" id="communeValue">-</span>
                     </div>
                     <div class="field-row">
-                        <span class="field-label" id="prixProduitsLabel">Prix produits</span>
-                        <span class="field-value" id="prixProduitsValue">-</span>
+                        <span class="field-label" data-key="prixProduit">Prix produit</span>
+                        <span class="field-value" id="prixProduitValue">-</span>
                     </div>
                     <div class="field-row">
-                        <span class="field-label" id="fraisLivraisonLabel">Frais de livraison</span>
+                        <span class="field-label" data-key="fraisLivraison">Frais de livraison</span>
                         <span class="field-value" id="fraisLivraisonValue">-</span>
                     </div>
                 </div>
@@ -224,14 +224,14 @@
                 
                 <div class="total-section">
                     <div class="total-row">
-                        <span class="total-label" id="totalLabel">Total</span>
+                        <span class="total-label" data-key="total">Total</span>
                         <span class="total-value" id="totalValue">€0.00</span>
                     </div>
                 </div>
                 
                 <div class="action-buttons">
-                    <button class="btn btn-primary" id="callBtn">Call by phone</button>
-                    <button class="btn btn-secondary" id="addNotesBtn">Add notes</button>
+                    <button class="btn btn-primary" id="callBtn" data-key="callClient">📞 Appeler le client</button>
+                    <button class="btn btn-secondary" id="addNotesBtn" data-key="memos">📝 Mémos / Notes</button>
                 </div>
                 
                 <div class="notes-section" id="notesSection">
@@ -254,5 +254,5 @@
 
     <script src="script.js"></script>
 </body>
-                        </html>
-                        
+    </html>
+    
