@@ -512,6 +512,9 @@ class OrdersManager {
             this.renderOrders();
             this.updateStats();
             this.showNotification(window.langManager.t('statusUpdated'));
+            
+            // Send WhatsApp message
+            this.sendWhatsAppStatusUpdate(order, newStatus);
         }
     }
     
@@ -578,6 +581,217 @@ class OrdersManager {
         this.updateStats();
         
         this.showNotification(window.langManager.t('testOrderAdded'));
+    }
+    
+    toggleManualOrderForm() {
+        const form = document.getElementById('manualOrderForm');
+        form.classList.toggle('show');
+        
+        if (!form.classList.contains('show')) {
+            this.clearManualOrderForm();
+        }
+    }
+    
+    clearManualOrderForm() {
+        document.getElementById('manualCustomerName').value = '';
+        document.getElementById('manualPhone').value = '';
+        document.getElementById('manualWilaya').value = '';
+        document.getElementById('manualCity').value = '';
+        document.getElementById('manualProduct').value = '';
+        document.getElementById('manualVariants').value = '';
+        document.getElementById('manualQuantity').value = '1';
+        document.getElementById('manualTotal').value = '';
+        document.getElementById('manualNotes').value = '';
+    }
+    
+    saveManualOrder() {
+        const customerName = document.getElementById('manualCustomerName').value.trim();
+        const phone = document.getElementById('manualPhone').value.trim();
+        const wilaya = document.getElementById('manualWilaya').value.trim();
+        const city = document.getElementById('manualCity').value.trim();
+        const product = document.getElementById('manualProduct').value.trim();
+        const variants = document.getElementById('manualVariants').value.trim();
+        const quantity = parseInt(document.getElementById('manualQuantity').value);
+        const total = parseFloat(document.getElementById('manualTotal').value);
+        const notes = document.getElementById('manualNotes').value.trim();
+        
+        // Validation
+        if (!customerName || !phone || !wilaya || !city || !product || !quantity || !total) {
+            this.showNotification('Veuillez remplir tous les champs obligatoires');
+            return;
+        }
+        
+        const newOrder = {
+            id: String(this.orders.length + 1),
+            customerName,
+            phone,
+            wilaya,
+            city,
+            product,
+            variants: variants || 'Standard',
+            quantity,
+            total,
+            customerNotes: notes,
+            sellerNotes: '',
+            date: new Date().toISOString(),
+            status: 'new',
+            isRead: false
+        };
+        
+        this.orders.unshift(newOrder);
+        this.filteredOrders = [...this.orders];
+        this.saveOrders();
+        this.renderOrders();
+        this.updateStats();
+        this.toggleManualOrderForm();
+        
+        this.showNotification('Commande ajoutée avec succès !');
+    }
+    
+    toggleReturnExchangeSection() {
+        const section = document.getElementById('returnExchangeSection');
+        section.classList.toggle('show');
+        
+        if (!section.classList.contains('show')) {
+            // Clear form
+            document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById('returnReason').value = '';
+        }
+    }
+    
+    submitReturnExchange() {
+        const selectedOption = document.querySelector('.return-option.selected');
+        const reason = document.getElementById('returnReason').value.trim();
+        
+        if (!selectedOption) {
+            this.showNotification('Veuillez sélectionner le type de demande');
+            return;
+        }
+        
+        if (!reason) {
+            this.showNotification('Veuillez indiquer la raison');
+            return;
+        }
+        
+        const type = selectedOption.getAttribute('data-type');
+        const typeText = type === 'return' ? 'Retour' : 'Échange';
+        
+        // Add to seller notes
+        const currentNotes = document.getElementById('notesTextarea').value;
+        const newNote = `🔄 ${typeText} demandé: ${reason}`;
+        const updatedNotes = currentNotes ? `${currentNotes}\n${newNote}` : newNote;
+        
+        document.getElementById('notesTextarea').value = updatedNotes;
+        this.saveSellerNotes();
+        
+        // Update order status if needed
+        if (this.currentOrder) {
+            this.currentOrder.status = 'processing';
+            this.saveOrders();
+            this.renderOrders();
+            this.updateStats();
+        }
+        
+        this.toggleReturnExchangeSection();
+        this.showNotification(`Demande de ${typeText.toLowerCase()} enregistrée`);
+    }
+    
+    showDeleteConfirmation() {
+        const dialog = document.getElementById('confirmationDialog');
+        dialog.classList.add('show');
+    }
+    
+    hideDeleteConfirmation() {
+        const dialog = document.getElementById('confirmationDialog');
+        dialog.classList.remove('show');
+    }
+    
+    deleteCurrentOrder() {
+        if (!this.currentOrder) return;
+        
+        const orderIndex = this.orders.findIndex(o => o.id === this.currentOrder.id);
+        if (orderIndex !== -1) {
+            this.orders.splice(orderIndex, 1);
+            this.filteredOrders = [...this.orders];
+            this.saveOrders();
+            this.renderOrders();
+            this.updateStats();
+            this.closeModal();
+            this.hideDeleteConfirmation();
+            this.showNotification('Commande supprimée avec succès');
+        }
+    }
+    
+    sendWhatsAppStatusUpdate(order, newStatus) {
+        // Check if phone number is valid for WhatsApp
+        const phoneNumber = this.formatPhoneForWhatsApp(order.phone);
+        
+        if (!phoneNumber) {
+            this.showWhatsAppStatus('Numéro de téléphone invalide', true);
+            return;
+        }
+        
+        // Create status message
+        const statusMessages = {
+            new: 'Votre commande a été reçue et est en cours de traitement.',
+            processing: 'Votre commande est en cours de préparation.',
+            shipped: 'Votre commande a été expédiée et est en route.',
+            completed: 'Votre commande a été livrée avec succès.',
+            cancelled: 'Votre commande a été annulée.'
+        };
+        
+        const message = `Bonjour ${order.customerName},\n\n` +
+                       `Mise à jour de votre commande #${order.id}:\n` +
+                       `${statusMessages[newStatus]}\n\n` +
+                       `Produit: ${order.product}\n` +
+                       `Quantité: ${order.quantity}\n` +
+                       `Total: €${order.total}\n\n` +
+                       `Merci de votre confiance !\n` +
+                       `YouzinElegancia`;
+        
+        // Create WhatsApp URL
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+        
+        // Open WhatsApp
+        window.open(whatsappUrl, '_blank');
+        
+        // Show success message
+        this.showWhatsAppStatus('Message préparé pour WhatsApp');
+    }
+    
+    formatPhoneForWhatsApp(phone) {
+        // Remove all non-digit characters
+        const cleaned = phone.replace(/\D/g, '');
+        
+        // Check if it's a valid phone number (at least 8 digits)
+        if (cleaned.length < 8) {
+            return null;
+        }
+        
+        // Add country code if missing (assuming France +33)
+        if (cleaned.startsWith('0')) {
+            return '33' + cleaned.substring(1);
+        } else if (cleaned.startsWith('33')) {
+            return cleaned;
+        } else if (cleaned.length >= 9) {
+            return cleaned;
+        }
+        
+        return null;
+    }
+    
+    showWhatsAppStatus(message, isError = false) {
+        const statusDiv = document.getElementById('whatsappStatus');
+        const messageSpan = document.getElementById('whatsappMessage');
+        
+        messageSpan.textContent = message;
+        statusDiv.classList.toggle('error', isError);
+        statusDiv.classList.add('show');
+        
+        // Hide after 5 seconds
+        setTimeout(() => {
+            statusDiv.classList.remove('show');
+        }, 5000);
     }
     
     exportOrders() {
@@ -670,6 +884,53 @@ class OrdersManager {
         document.getElementById('notesTextarea').addEventListener('input', 
             this.debounce(() => this.saveSellerNotes(), 1000)
         );
+        
+        // Return/Exchange functionality
+        document.getElementById('returnExchangeBtn').addEventListener('click', () => {
+            this.toggleReturnExchangeSection();
+        });
+        
+        document.getElementById('submitReturnExchange').addEventListener('click', () => {
+            this.submitReturnExchange();
+        });
+        
+        document.getElementById('cancelReturnExchange').addEventListener('click', () => {
+            this.toggleReturnExchangeSection();
+        });
+        
+        // Return option selection
+        document.querySelectorAll('.return-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                document.querySelectorAll('.return-option').forEach(opt => opt.classList.remove('selected'));
+                e.target.classList.add('selected');
+            });
+        });
+        
+        // Delete order functionality
+        document.getElementById('deleteOrderBtn').addEventListener('click', () => {
+            this.showDeleteConfirmation();
+        });
+        
+        document.getElementById('confirmDelete').addEventListener('click', () => {
+            this.deleteCurrentOrder();
+        });
+        
+        document.getElementById('cancelDelete').addEventListener('click', () => {
+            this.hideDeleteConfirmation();
+        });
+        
+        // Manual order form
+        document.getElementById('addManualOrderBtn').addEventListener('click', () => {
+            this.toggleManualOrderForm();
+        });
+        
+        document.getElementById('saveManualOrder').addEventListener('click', () => {
+            this.saveManualOrder();
+        });
+        
+        document.getElementById('cancelManualOrder').addEventListener('click', () => {
+            this.toggleManualOrderForm();
+        });
     }
     
     openOrderModal(orderId) {
