@@ -143,19 +143,18 @@
 
         <!-- Orders Table -->
         <div class="table-container">
+            <div class="scroll-hint" id="scrollHint">
+                <i class="fas fa-hand-point-right"></i>
+                <span>Swipe left or right to view more columns</span>
+            </div>
             <table class="orders-table" id="ordersTable">
                 <thead>
                     <tr>
-                        <th data-key="orderNumber">N°</th>
-                        <th data-key="customerName">Prénom</th>
-                        <th class="desktop-only" data-key="phone">Téléphone</th>
-                        <th class="desktop-only" data-key="wilaya">Wilaya</th>
-                        <th data-key="product">Produit</th>
-                        <th class="desktop-only" data-key="quantity">Quantité</th>
-                        <th class="desktop-only" data-key="total">Total</th>
-                        <th class="desktop-only" data-key="date">Date</th>
-                        <th data-key="status">Statut</th>
-                        <th data-key="actions">Actions</th>
+                        <th class="col-id">id</th>
+                        <th class="col-nom">Nom</th>
+                        <th class="col-produit">produit</th>
+                        <th class="col-statut">statut</th>
+                        <th class="col-action">action</th>
                     </tr>
                 </thead>
                 <tbody id="ordersTableBody">
@@ -326,17 +325,3 @@
             
             <div class="modal-footer">
                 <button class="btn btn-secondary" id="copyInfoBtn">
-                    <i class="fas fa-copy"></i>
-                    Copier infos
-                </button>
-                <button class="btn btn-secondary" id="printInvoiceBtn">
-                    <i class="fas fa-print"></i>
-                    Imprimer facture
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
