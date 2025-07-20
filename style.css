@@ -797,6 +797,24 @@ body {
     background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
 }
 
+.status-display.return {
+    background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    color: white;
+}
+
+.status-display.return:hover {
+    background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+}
+
+.status-display.exchange {
+    background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+    color: white;
+}
+
+.status-display.exchange:hover {
+    background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+}
+
 /* Action Buttons */
 .action-btn {
     padding: 0.5rem;
