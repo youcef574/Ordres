@@ -28,10 +28,10 @@ class LanguageManager {
                 addTestOrder: 'Commande test',
                 
                 // Table Headers
-                orderNumber: 'N° Commande',
-                customerName: 'Nom du client',
+                orderNumber: 'N°',
+                customerName: 'Nom',
                 phone: 'Téléphone',
-                address: 'Adresse',
+                wilaya: 'Wilaya',
                 product: 'Produit',
                 variants: 'Variantes',
                 quantity: 'Quantité',
@@ -98,10 +98,10 @@ class LanguageManager {
                 addTestOrder: 'Test order',
                 
                 // Table Headers
-                orderNumber: 'Order #',
-                customerName: 'Customer Name',
+                orderNumber: 'N°',
+                customerName: 'Name',
                 phone: 'Phone',
-                address: 'Address',
+                wilaya: 'Wilaya',
                 product: 'Product',
                 variants: 'Variants',
                 quantity: 'Quantity',
@@ -231,7 +231,8 @@ class OrdersManager {
                 id: 'ORD-001',
                 customerName: 'Marie Dubois',
                 phone: '+33 6 12 34 56 78',
-                address: '123 Rue de la Paix, 75001 Paris',
+                wilaya: 'Alger',
+                address: '123 Rue de la Paix, Alger',
                 product: 'Collier Élégance',
                 variants: 'Or rose, 45cm',
                 quantity: 1,
@@ -246,7 +247,8 @@ class OrdersManager {
                 id: 'ORD-002',
                 customerName: 'Jean Martin',
                 phone: '+33 6 98 76 54 32',
-                address: '456 Avenue des Champs, 69000 Lyon',
+                wilaya: 'Oran',
+                address: '456 Avenue des Champs, Oran',
                 product: 'Bague Diamant',
                 variants: 'Argent, Taille 56',
                 quantity: 1,
@@ -261,7 +263,8 @@ class OrdersManager {
                 id: 'ORD-003',
                 customerName: 'Sophie Laurent',
                 phone: '+33 6 11 22 33 44',
-                address: '789 Boulevard Saint-Michel, 13000 Marseille',
+                wilaya: 'Constantine',
+                address: '789 Boulevard Saint-Michel, Constantine',
                 product: 'Bracelet Charme',
                 variants: 'Or blanc, 18cm',
                 quantity: 2,
@@ -278,8 +281,23 @@ class OrdersManager {
     }
     
     bindEvents() {
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', (e) => {
+        // Search functionality with clear button
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        
+        searchInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+            if (value.length > 0) {
+                searchClear.style.display = 'block';
+            } else {
+                searchClear.style.display = 'none';
+            }
+            this.filterOrders();
+        });
+        
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            searchClear.style.display = 'none';
             this.filterOrders();
         });
         
@@ -374,7 +392,7 @@ class OrdersManager {
                 <td><strong>${order.id}</strong></td>
                 <td>${order.customerName}</td>
                 <td class="desktop-only">${order.phone}</td>
-                <td class="desktop-only">${order.address}</td>
+                <td class="desktop-only">${order.wilaya}</td>
                 <td>${order.product}</td>
                 <td class="desktop-only">${order.quantity}</td>
                 <td class="desktop-only">€${order.total.toFixed(2)}</td>
@@ -440,8 +458,9 @@ class OrdersManager {
         const testOrder = {
             id: `ORD-${String(this.orders.length + 1).padStart(3, '0')}`,
             customerName: 'Client Test',
-            phone: '+33 6 00 00 00 00',
-            address: '123 Rue Test, 75000 Paris',
+            phone: '+213 555 123 456',
+            wilaya: 'Alger',
+            address: '123 Rue Test, Alger',
             product: 'Produit Test',
             variants: 'Variante Test',
             quantity: 1,
@@ -480,7 +499,7 @@ class OrdersManager {
     
     generateCSV() {
         const headers = [
-            'Order ID', 'Customer Name', 'Phone', 'Address', 'Product', 
+            'Order ID', 'Customer Name', 'Phone', 'Wilaya', 'Product', 
             'Variants', 'Quantity', 'Total', 'Date', 'Status', 'Customer Notes', 'Seller Notes'
         ];
         
@@ -488,7 +507,7 @@ class OrdersManager {
             order.id,
             order.customerName,
             order.phone,
-            order.address,
+            order.wilaya,
             order.product,
             order.variants,
             order.quantity,
@@ -530,18 +549,24 @@ class OrdersManager {
             this.printInvoice();
         });
         
-        document.getElementById('updateStatusBtn').addEventListener('click', () => {
-            this.updateOrderStatus();
-        });
-        
         document.getElementById('callBtn').addEventListener('click', () => {
             this.callCustomer();
         });
         
+        // Status change buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('status-btn') || e.target.closest('.status-btn')) {
+                const btn = e.target.classList.contains('status-btn') ? e.target : e.target.closest('.status-btn');
+                const newStatus = btn.getAttribute('data-status');
+                this.updateOrderStatusTo(newStatus);
+            }
+        });
+        
         // Quick notes buttons
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('quick-note-btn')) {
-                const note = e.target.getAttribute('data-note');
+            if (e.target.classList.contains('quick-note-btn') || e.target.closest('.quick-note-btn')) {
+                const btn = e.target.classList.contains('quick-note-btn') ? e.target : e.target.closest('.quick-note-btn');
+                const note = btn.getAttribute('data-note');
                 this.addQuickNote(note);
             }
         });
@@ -585,18 +610,19 @@ class OrdersManager {
         document.getElementById('modalOrderDate').textContent = this.formatDate(order.date);
         document.getElementById('modalCustomerName').textContent = order.customerName;
         document.getElementById('modalCustomerPhone').textContent = order.phone;
+        document.getElementById('modalCustomerWilaya').textContent = order.wilaya;
         document.getElementById('modalCustomerAddress').textContent = order.address;
         document.getElementById('modalOrderTotal').textContent = `€${order.total.toFixed(2)}`;
         
         // Order items
         const itemsContainer = document.getElementById('modalOrderItems');
         itemsContainer.innerHTML = `
-            <div class="item-row">
-                <span>${order.product}</span>
-                <span>${order.variants}</span>
-                <span>${order.quantity}</span>
-                <span>€${order.total.toFixed(2)}</span>
+            <div class="item-details">
+                <div class="item-name">${order.product}</div>
+                <div class="item-variants">${order.variants}</div>
             </div>
+            <div class="item-quantity">${order.quantity}</div>
+            <div class="item-price">€${order.total.toFixed(2)}</div>
         `;
         
         // Customer notes
@@ -612,8 +638,9 @@ class OrdersManager {
         // Seller notes
         document.getElementById('sellerNotesInput').value = order.sellerNotes || '';
         
-        // Update progress
+        // Update progress and status buttons
         this.updateOrderProgress(order.status);
+        this.updateStatusButtons(order.status);
     }
     
     updateOrderProgress(status) {
@@ -631,6 +658,16 @@ class OrdersManager {
         });
     }
     
+    updateStatusButtons(currentStatus) {
+        const buttons = document.querySelectorAll('.status-btn');
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-status') === currentStatus) {
+                btn.classList.add('active');
+            }
+        });
+    }
+    
     copyOrderInfo() {
         if (!this.currentOrder) return;
         
@@ -639,6 +676,7 @@ class OrdersManager {
 Commande: ${order.id}
 Client: ${order.customerName}
 Téléphone: ${order.phone}
+Wilaya: ${order.wilaya}
 Adresse: ${order.address}
 Produit: ${order.product}
 Variantes: ${order.variants}
@@ -658,21 +696,16 @@ ${order.customerNotes ? `Notes client: ${order.customerNotes}` : ''}
         window.print();
     }
     
-    updateOrderStatus() {
-        if (!this.currentOrder) return;
+    updateOrderStatusTo(newStatus) {
+        if (!this.currentOrder || this.currentOrder.status === newStatus) return;
         
-        const statusOrder = ['new', 'processing', 'shipped', 'completed'];
-        const currentIndex = statusOrder.indexOf(this.currentOrder.status);
-        const nextStatus = statusOrder[Math.min(currentIndex + 1, statusOrder.length - 1)];
-        
-        if (nextStatus !== this.currentOrder.status) {
-            this.currentOrder.status = nextStatus;
-            this.saveOrders();
-            this.renderOrders();
-            this.updateStats();
-            this.updateOrderProgress(nextStatus);
-            this.showNotification(window.langManager.t('statusUpdated'));
-        }
+        this.currentOrder.status = newStatus;
+        this.saveOrders();
+        this.renderOrders();
+        this.updateStats();
+        this.updateOrderProgress(newStatus);
+        this.updateStatusButtons(newStatus);
+        this.showNotification(window.langManager.t('statusUpdated'));
     }
     
     callCustomer() {
