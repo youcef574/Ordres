@@ -28,34 +28,35 @@ class LanguageManager {
                 addTestOrder: 'Commande test',
                 
                 // Table Headers
-                orderNumber: 'N° Commande',
-                customerName: 'Nom du client',
+                id: 'id',
+                nom: 'Nom',
                 phone: 'Téléphone',
-                address: 'Adresse',
-                product: 'Produit',
+                wilaya: 'Wilaya',
+                produit: 'produit',
                 variants: 'Variantes',
-                quantity: 'Quantité',
+                quantity: 'Qté',
                 total: 'Total',
                 date: 'Date',
-                status: 'Statut',
-                actions: 'Actions',
+                statut: 'statut',
+                action: 'action',
                 
                 // Modal
-                orderDetails: 'Détails de la commande',
-                invoice: 'Facture',
-                customerInfo: 'Informations client',
-                callNow: 'Appeler',
-                orderItems: 'Articles commandés',
-                price: 'Prix',
-                customerNotes: 'Notes du client',
-                sellerNotes: 'Notes internes',
-                sellerNotesPlaceholder: 'Ajouter des notes internes...',
+                invoiceTitle: 'Facture de clients',
+                produits: 'Produits',
+                variantes: 'Variantes',
+                quantite: 'Quantité',
+                nom: 'Nom',
+                telephone: 'Téléphone',
+                wilaya: 'Wilaya',
+                commune: 'Commune',
+                prixProduits: 'Prix produits',
+                fraisLivraison: 'Frais de livraison',
+                totalPrice: 'Total',
+                callByPhone: 'Call by phone',
+                addNotes: 'Add notes',
                 noAnswer: '❌ N\'a pas répondu',
                 called: '☎ Appelé avec succès',
                 callLater: '⏳ Rappeler plus tard',
-                copyInfo: 'Copier infos',
-                printInvoice: 'Imprimer',
-                updateStatus: 'Mettre à jour',
                 
                 // Actions
                 details: 'Détails',
@@ -98,34 +99,35 @@ class LanguageManager {
                 addTestOrder: 'Test order',
                 
                 // Table Headers
-                orderNumber: 'Order #',
-                customerName: 'Customer Name',
+                id: 'id',
+                nom: 'Name',
                 phone: 'Phone',
-                address: 'Address',
-                product: 'Product',
+                wilaya: 'Wilaya',
+                produit: 'product',
                 variants: 'Variants',
-                quantity: 'Quantity',
+                quantity: 'Qty',
                 total: 'Total',
                 date: 'Date',
-                status: 'Status',
-                actions: 'Actions',
+                statut: 'status',
+                action: 'action',
                 
                 // Modal
-                orderDetails: 'Order Details',
-                invoice: 'Invoice',
-                customerInfo: 'Customer Information',
-                callNow: 'Call',
-                orderItems: 'Order Items',
-                price: 'Price',
-                customerNotes: 'Customer Notes',
-                sellerNotes: 'Internal Notes',
-                sellerNotesPlaceholder: 'Add internal notes...',
+                invoiceTitle: 'Customer Invoice',
+                produits: 'Products',
+                variantes: 'Variants',
+                quantite: 'Quantity',
+                nom: 'Name',
+                telephone: 'Phone',
+                wilaya: 'Wilaya',
+                commune: 'City',
+                prixProduits: 'Product price',
+                fraisLivraison: 'Delivery fees',
+                totalPrice: 'Total',
+                callByPhone: 'Call by phone',
+                addNotes: 'Add notes',
                 noAnswer: '❌ No answer',
                 called: '☎ Called successfully',
                 callLater: '⏳ Call back later',
-                copyInfo: 'Copy info',
-                printInvoice: 'Print',
-                updateStatus: 'Update',
                 
                 // Actions
                 details: 'Details',
@@ -163,6 +165,14 @@ class LanguageManager {
         localStorage.setItem('language', this.currentLang);
         this.updateLanguageDisplay();
         this.translatePage();
+        
+        // Update table headers
+        this.updateTableHeaders();
+        
+        // Update modal if open
+        if (window.ordersManager && window.ordersManager.currentOrder) {
+            window.ordersManager.populateModal(window.ordersManager.currentOrder);
+        }
     }
     
     updateLanguageDisplay() {
@@ -185,6 +195,17 @@ class LanguageManager {
             const key = element.getAttribute('data-key-placeholder');
             if (this.translations[this.currentLang][key]) {
                 element.placeholder = this.translations[this.currentLang][key];
+            }
+        });
+    }
+    
+    updateTableHeaders() {
+        const headers = document.querySelectorAll('.orders-table th');
+        const headerKeys = ['id', 'nom', 'phone', 'wilaya', 'produit', 'variants', 'quantity', 'total', 'date', 'statut', 'action'];
+        
+        headers.forEach((header, index) => {
+            if (headerKeys[index] && this.translations[this.currentLang][headerKeys[index]]) {
+                header.textContent = this.translations[this.currentLang][headerKeys[index]];
             }
         });
     }
@@ -618,16 +639,12 @@ class OrdersManager {
         });
         
         // Modal action buttons
-        document.getElementById('copyInfoBtn').addEventListener('click', () => {
-            this.copyOrderInfo();
-        });
-        
-        document.getElementById('printInvoiceBtn').addEventListener('click', () => {
-            this.printInvoice();
-        });
-        
         document.getElementById('callBtn').addEventListener('click', () => {
             this.callCustomer();
+        });
+        
+        document.getElementById('addNotesBtn').addEventListener('click', () => {
+            this.toggleNotesSection();
         });
         
         // Quick notes buttons
@@ -639,7 +656,7 @@ class OrdersManager {
         });
         
         // Auto-save seller notes
-        document.getElementById('sellerNotesInput').addEventListener('input', 
+        document.getElementById('notesTextarea').addEventListener('input', 
             this.debounce(() => this.saveSellerNotes(), 1000)
         );
     }
@@ -672,84 +689,42 @@ class OrdersManager {
     }
     
     populateModal(order) {
-        // Basic info
-        document.getElementById('modalOrderId').textContent = order.id;
-        document.getElementById('modalOrderDate').textContent = this.formatDate(order.date);
-        document.getElementById('modalCustomerName').textContent = order.customerName;
-        document.getElementById('modalCustomerPhone').textContent = order.phone;
-        document.getElementById('modalCustomerWilaya').textContent = order.wilaya;
-        document.getElementById('modalCustomerCity').textContent = order.city;
-        document.getElementById('modalOrderTotal').textContent = `€${order.total.toFixed(2)}`;
+        // Update modal title
+        document.getElementById('modalTitle').textContent = window.langManager.t('invoiceTitle');
         
-        // Order items
-        const itemsContainer = document.getElementById('modalOrderItems');
-        itemsContainer.innerHTML = `
-            <div class="item-row">
-                <span>${order.product}</span>
-                <span>${order.variants}</span>
-                <span>${order.quantity}</span>
-                <span>€${order.total.toFixed(2)}</span>
-            </div>
-        `;
+        // Update field labels
+        document.getElementById('produitsLabel').textContent = window.langManager.t('produits');
+        document.getElementById('variantesLabel').textContent = window.langManager.t('variantes');
+        document.getElementById('quantiteLabel').textContent = window.langManager.t('quantite');
+        document.getElementById('nomLabel').textContent = window.langManager.t('nom');
+        document.getElementById('telephoneLabel').textContent = window.langManager.t('telephone');
+        document.getElementById('wilayaLabel').textContent = window.langManager.t('wilaya');
+        document.getElementById('communeLabel').textContent = window.langManager.t('commune');
+        document.getElementById('prixProduitsLabel').textContent = window.langManager.t('prixProduits');
+        document.getElementById('fraisLivraisonLabel').textContent = window.langManager.t('fraisLivraison');
+        document.getElementById('totalLabel').textContent = window.langManager.t('totalPrice');
+        document.getElementById('callBtn').textContent = window.langManager.t('callByPhone');
+        document.getElementById('addNotesBtn').textContent = window.langManager.t('addNotes');
         
-        // Customer notes
-        const notesSection = document.getElementById('customerNotesSection');
-        const notesElement = document.getElementById('modalCustomerNotes');
-        if (order.customerNotes) {
-            notesElement.textContent = order.customerNotes;
-            notesSection.style.display = 'block';
-        } else {
-            notesSection.style.display = 'none';
-        }
+        // Update field values
+        document.getElementById('produitsValue').textContent = order.product;
+        document.getElementById('variantesValue').textContent = order.variants;
+        document.getElementById('quantiteValue').textContent = order.quantity;
+        document.getElementById('nomValue').textContent = order.customerName;
+        document.getElementById('telephoneValue').textContent = order.phone;
+        document.getElementById('wilayaValue').textContent = order.wilaya;
+        document.getElementById('communeValue').textContent = order.city;
         
-        // Seller notes
-        document.getElementById('sellerNotesInput').value = order.sellerNotes || '';
+        // Calculate delivery fee (10% of product price)
+        const productPrice = order.total * 0.9; // Assuming 90% is product, 10% is delivery
+        const deliveryFee = order.total * 0.1;
         
-        // Update progress
-        this.updateOrderProgress(order.status);
-    }
-    
-    updateOrderProgress(status) {
-        const steps = document.querySelectorAll('.progress-step');
-        const statusOrder = ['new', 'processing', 'shipped', 'completed'];
-        const currentIndex = statusOrder.indexOf(status);
+        document.getElementById('prixProduitsValue').textContent = `€${productPrice.toFixed(2)}`;
+        document.getElementById('fraisLivraisonValue').textContent = `€${deliveryFee.toFixed(2)}`;
+        document.getElementById('totalValue').textContent = `€${order.total.toFixed(2)}`;
         
-        steps.forEach((step, index) => {
-            step.classList.remove('active', 'completed');
-            if (index < currentIndex) {
-                step.classList.add('completed');
-            } else if (index === currentIndex) {
-                step.classList.add('active');
-            }
-        });
-    }
-    
-    copyOrderInfo() {
-        if (!this.currentOrder) return;
-        
-        const order = this.currentOrder;
-        const info = `
-Commande N°: ${order.id}
-Client: ${order.customerName}
-Téléphone: ${order.phone}
-Wilaya: ${order.wilaya}
-Ville: ${order.city}
-Produit: ${order.product}
-Variantes: ${order.variants}
-Quantité: ${order.quantity}
-Total: €${order.total.toFixed(2)}
-Date: ${this.formatDate(order.date)}
-Statut: ${order.status}
-${order.customerNotes ? `Notes client: ${order.customerNotes}` : ''}
-        `.trim();
-        
-        navigator.clipboard.writeText(info).then(() => {
-            this.showNotification(window.langManager.t('orderCopied'));
-        });
-    }
-    
-    printInvoice() {
-        window.print();
+        // Update notes
+        document.getElementById('notesTextarea').value = order.sellerNotes || '';
     }
     
     callCustomer() {
@@ -759,8 +734,13 @@ ${order.customerNotes ? `Notes client: ${order.customerNotes}` : ''}
         window.open(`tel:${phoneNumber}`, '_self');
     }
     
+    toggleNotesSection() {
+        const notesSection = document.getElementById('notesSection');
+        notesSection.classList.toggle('show');
+    }
+    
     addQuickNote(note) {
-        const textarea = document.getElementById('sellerNotesInput');
+        const textarea = document.getElementById('notesTextarea');
         const currentNotes = textarea.value;
         const newNotes = currentNotes ? `${currentNotes}\n${note}` : note;
         
@@ -772,7 +752,7 @@ ${order.customerNotes ? `Notes client: ${order.customerNotes}` : ''}
     saveSellerNotes() {
         if (!this.currentOrder) return;
         
-        const notes = document.getElementById('sellerNotesInput').value;
+        const notes = document.getElementById('notesTextarea').value;
         this.currentOrder.sellerNotes = notes;
         this.saveOrders();
     }
@@ -970,6 +950,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Add loading states
     document.body.classList.add('loaded');
+    
+    // Initialize table headers translation
+    window.langManager.updateTableHeaders();
     
     // Show scroll hint on mobile
     const scrollHint = document.getElementById('scrollHint');
