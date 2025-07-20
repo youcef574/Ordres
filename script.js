@@ -397,7 +397,13 @@ class OrdersManager {
             row.innerHTML = `
                 <td class="col-id"><strong>${index + 1}</strong></td>
                 <td class="col-nom truncate" title="${order.customerName}">${firstName}</td>
+                <td class="col-phone">${order.phone}</td>
+                <td class="col-wilaya truncate" title="${order.wilaya}, ${order.city}">${order.wilaya}</td>
                 <td class="col-produit truncate" title="${order.product}">${order.product}</td>
+                <td class="col-variants truncate" title="${order.variants}">${order.variants}</td>
+                <td class="col-quantity">${order.quantity}</td>
+                <td class="col-total">€${order.total.toFixed(2)}</td>
+                <td class="col-date">${this.formatDate(order.date)}</td>
                 <td class="col-statut">${this.renderStatusDropdown(order.id, order.status)}</td>
                 <td class="col-action">
                     <button class="action-btn" onclick="ordersManager.openOrderModal('${order.id}')">
