@@ -98,8 +98,8 @@ class LanguageManager {
                 // Notifications
                 orderDeleted: "Commande supprimée avec succès",
                 statusUpdated: "Statut mis à jour avec succès",
-                whatsappSent: "Notification WhatsApp envoyée",
-                whatsappError: "Erreur lors de l'envoi WhatsApp",
+                whatsappSent: "Message WhatsApp envoyé avec succès",
+                whatsappError: "Erreur lors de l'envoi du message WhatsApp",
                 orderSaved: "Commande enregistrée avec succès",
                 
                 // Notes
@@ -203,8 +203,8 @@ class LanguageManager {
                 // Notifications
                 orderDeleted: "Order deleted successfully",
                 statusUpdated: "Status updated successfully",
-                whatsappSent: "WhatsApp notification sent",
-                whatsappError: "Error sending WhatsApp notification",
+                whatsappSent: "WhatsApp message sent successfully",
+                whatsappError: "Error sending WhatsApp message",
                 orderSaved: "Order saved successfully",
                 
                 // Notes
@@ -581,10 +581,12 @@ class OrderManager {
         // Add status change event listener
         const statusSelect = row.querySelector('.status-select');
         statusSelect.addEventListener('change', (e) => {
-            e.preventDefault();
-            this.showStatusChangeModal(order.id, e.target.value);
-            // Reset to original value until confirmed
-            e.target.value = order.statut;
+            const newStatus = e.target.value;
+            if (newStatus !== order.statut) {
+                this.showStatusChangeModal(order.id, newStatus, order.statut);
+                // Reset to original value until confirmed
+                e.target.value = order.statut;
+            }
         });
 
         return row;
@@ -603,16 +605,16 @@ class OrderManager {
         return statusTexts[status] || status;
     }
 
-    showStatusChangeModal(orderId, newStatus) {
+    showStatusChangeModal(orderId, newStatus, currentStatus) {
         const order = this.orders.find(o => o.id === orderId);
         if (!order) return;
 
         // Create status change modal
         const modalHTML = `
-            <div class="modal-overlay" id="statusChangeModal" style="z-index: 3000;">
+            <div class="modal-overlay show" id="statusChangeModal" style="z-index: 3000;">
                 <div class="status-change-modal">
                     <div class="modal-header">
-                        <h3 data-key="changeStatus">${this.languageManager.getTranslation('changeStatus')}</h3>
+                        <h3>${this.languageManager.getTranslation('changeStatus')}</h3>
                         <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">
                             <i class="fas fa-times"></i>
                         </button>
@@ -625,42 +627,37 @@ class OrderManager {
                             </div>
                             
                             <div class="status-selection">
-                                <label data-key="selectNewStatus">${this.languageManager.getTranslation('selectNewStatus')}</label>
+                                <label>${this.languageManager.getTranslation('selectNewStatus')}</label>
                                 <select id="statusChangeSelect" class="status-change-select">
-                                    <option value="new" ${newStatus === 'new' ? 'selected' : ''} data-key="new">${this.languageManager.getTranslation('new')}</option>
-                                    <option value="processing" ${newStatus === 'processing' ? 'selected' : ''} data-key="processing">${this.languageManager.getTranslation('processing')}</option>
-                                    <option value="shipped" ${newStatus === 'shipped' ? 'selected' : ''} data-key="shipped">${this.languageManager.getTranslation('shipped')}</option>
-                                    <option value="completed" ${newStatus === 'completed' ? 'selected' : ''} data-key="completed">${this.languageManager.getTranslation('completed')}</option>
-                                    <option value="cancelled" ${newStatus === 'cancelled' ? 'selected' : ''} data-key="cancelled">${this.languageManager.getTranslation('cancelled')}</option>
-                                    <option value="return" ${newStatus === 'return' ? 'selected' : ''} data-key="statusReturn">${this.languageManager.getTranslation('statusReturn')}</option>
-                                    <option value="exchange" ${newStatus === 'exchange' ? 'selected' : ''} data-key="statusExchange">${this.languageManager.getTranslation('statusExchange')}</option>
+                                    <option value="new" ${newStatus === 'new' ? 'selected' : ''}>${this.languageManager.getTranslation('new')}</option>
+                                    <option value="processing" ${newStatus === 'processing' ? 'selected' : ''}>${this.languageManager.getTranslation('processing')}</option>
+                                    <option value="shipped" ${newStatus === 'shipped' ? 'selected' : ''}>${this.languageManager.getTranslation('shipped')}</option>
+                                    <option value="completed" ${newStatus === 'completed' ? 'selected' : ''}>${this.languageManager.getTranslation('completed')}</option>
+                                    <option value="cancelled" ${newStatus === 'cancelled' ? 'selected' : ''}>${this.languageManager.getTranslation('cancelled')}</option>
+                                    <option value="return" ${newStatus === 'return' ? 'selected' : ''}>${this.languageManager.getTranslation('statusReturn')}</option>
+                                    <option value="exchange" ${newStatus === 'exchange' ? 'selected' : ''}>${this.languageManager.getTranslation('statusExchange')}</option>
                                 </select>
                             </div>
                             
                             <div class="whatsapp-notification">
                                 <label class="checkbox-label">
-                                    <input type="checkbox" id="notifyWhatsApp" checked>
+                                    <input type="checkbox" id="notifyWhatsApp">
                                     <span class="checkmark"></span>
-                                    <span data-key="notifyWhatsApp">${this.languageManager.getTranslation('notifyWhatsApp')}</span>
+                                    <span>${this.languageManager.getTranslation('notifyWhatsApp')}</span>
                                 </label>
-                                <p class="whatsapp-info" data-key="whatsappMessage">${this.languageManager.getTranslation('whatsappMessage')}</p>
+                                <p class="whatsapp-info">${this.languageManager.getTranslation('whatsappMessage')}</p>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()" data-key="cancel">${this.languageManager.getTranslation('cancel')}</button>
-                        <button class="btn btn-primary" onclick="orderManager.confirmStatusChange(${orderId})" data-key="updateStatus">${this.languageManager.getTranslation('updateStatus')}</button>
+                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">${this.languageManager.getTranslation('cancel')}</button>
+                        <button class="btn btn-primary" onclick="orderManager.confirmStatusChange(${orderId})">${this.languageManager.getTranslation('updateStatus')}</button>
                     </div>
                 </div>
             </div>
         `;
 
         document.body.insertAdjacentHTML('beforeend', modalHTML);
-        
-        // Show modal with animation
-        setTimeout(() => {
-            document.getElementById('statusChangeModal').classList.add('show');
-        }, 10);
     }
 
     confirmStatusChange(orderId) {
